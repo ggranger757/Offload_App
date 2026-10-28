@@ -9,11 +9,12 @@ Offload is a progressive web app (PWA). It installs to the home screen, works of
 - **Notes, checklists and reminders.** Lists take one item per line; end the first line with `:` to name the list. Reminders can repeat on chosen days.
 - **Add to Calendar.** Every reminder has an **Add to Calendar** button. On iPhone, new reminders open the "Add to Calendar" screen as soon as they're saved, so the phone alerts you even when Offload is closed. Turn this off in **Settings → Reminders**. On other devices it saves a calendar file to open.
 - **One way to organize: #tags.** Type `#work` anywhere in an entry, or tap a suggested tag above the keyboard. The switch at the top picks a view (All, Notes, Lists, Reminders); the tag pills under it narrow that view to one tag. Whenever a tag, Pinned or a search narrows the view, a bar says how many entries are hidden and **Show all** brings them back. Every count matches what you'll see. While a tag is selected, new entries get it automatically. Note, List and Reminder describe *what* an entry is; tags describe *what it's about*.
-- **Tag colors.** Tags you create with **+ Tag** get a small colored dot inside the pill. Pick any of six colors (or none); select a tag and tap **Edit tag** to change it later. Tags you only type as `#name` stay plain until you give them a color.
-- **Search** covers every entry.
+- **Tag colors.** Hashtags show as bold colored text. Give a tag its own color (six choices, or none) when you create it with **+ Tag**, or select it and tap **Edit tag**. Tags without a chosen color use the theme's accent.
+- **Search** covers every entry. Press `/` to jump to it.
+- **A real desktop layout.** On screens 1024px and wider, Offload shows a sidebar with views and tags, the capture box at the top with your newest entries right under it, and (from 1280px) an Upcoming reminders panel. Hover an entry to pin, edit or delete it. Press `N` to start a new entry and Ctrl/⌘ + Enter to save.
 - **Share target.** On Android, share a link or text into Offload to start a note.
-- **Quick add by voice.** Opening `…/OffloadApp/?add=your%20text` saves a note immediately (add `&tag=work` to tag it). Use it from a Siri Shortcut (Dictate Text → URL Encode → Open URLs) or an Android automation app. On iPhone the link opens Safari, which stores entries separately from the home-screen app. `?new=1` just opens the composer; Android's long-press **New note** shortcut uses it. Steps are in **Settings → Quick add by voice**.
-- **Your choice of look.** Light, dark or system theme; sans, serif or mono font.
+- **New note shortcut.** On Android, press and hold the Offload icon and choose **New note** to open straight to the composer.
+- **Your choice of look.** A near-black dark theme by default for new installs, plus light and system; sans, serif or mono font.
 - **Backup.** Copy a JSON backup and import it on another device.
 
 **Live app:** https://ggranger757.github.io/OffloadApp/

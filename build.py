@@ -14,7 +14,7 @@ SRC = ROOT / 'src' / 'app.html'
 OUT = ROOT
 
 DESCRIPTION = "A private feed for everything you don't want to forget."
-BG = '#ECEFF3'
+BG = '#0A0A0A'
 
 def main():
     app = SRC.read_text(encoding='utf-8')
