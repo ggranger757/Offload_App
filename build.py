@@ -4,11 +4,10 @@ Edit src/app.html and src/sw.js, then run this to regenerate index.html, sw.js a
 
 Usage:
     python3 build.py
-    OFFLOAD_SERVER=https://offload-inbox.yourname.workers.dev python3 build.py
 
 Needs only the Python standard library.
 """
-import hashlib, json, os, pathlib
+import hashlib, json, pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent
 SRC = ROOT / 'src' / 'app.html'
@@ -19,16 +18,13 @@ BG = '#ECEFF3'
 
 def main():
     app = SRC.read_text(encoding='utf-8')
-    server = os.environ.get('OFFLOAD_SERVER', '').strip().rstrip('/')
-    if server:
-        app = app.replace('__OFFLOAD_SERVER__', server)
 
 
     head = f'''<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="{BG}">
 <meta name="description" content="{DESCRIPTION}">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -64,7 +60,7 @@ def main():
 
     # GitHub Pages: serve files as-is.
     (OUT / '.nojekyll').write_text('')
-    print(f'Built index.html (version {version})' + (f', inbox server {server}' if server else ', no inbox server baked in'))
+    print(f'Built index.html (version {version})')
 
 if __name__ == '__main__':
     main()
