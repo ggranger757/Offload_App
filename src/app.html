@@ -8,6 +8,7 @@
 :root{
   --bg:#ECEFF3; --surface:#FFFFFF; --sunk:#F5F6F9; --ink:#13161C; --muted:#5D6574; --line:#D7DBE2;
   --accent:#2F43E0; --accent-ink:#FFFFFF; --accent-soft:#E3E6FC;
+  --track:#DFE3EA; --raise:#FFFFFF;
   --hl:#FFE36B; --hl-ink:#3A2F00;
   --due:#C23A22; --due-soft:#FBE4DF; --ok:#1E8556;
   --c1:#D2462B; --c2:#C27700; --c3:#1E8556; --c4:#0B7FA6; --c5:#7A45D1; --c6:#C2338A;
@@ -21,13 +22,13 @@
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0C0E12; --surface:#161920; --sunk:#1D2129; --ink:#E8EBF1; --muted:#8C94A3; --line:#272B35;
-  --accent:#7D8CFF; --accent-ink:#0C0E12; --accent-soft:#232A55;
+  --accent:#7D8CFF; --accent-ink:#0C0E12; --accent-soft:#232A55; --track:#1A1D24; --raise:#2C313C;
   --hl:#3B3412; --hl-ink:#FFE27A; --due:#FF7A5E; --due-soft:#3A1E18; --ok:#4FD39A;
   --c1:#FF7A5E; --c2:#FFB547; --c3:#4FD39A; --c4:#4CC3EC; --c5:#B192FF; --c6:#FF7CC8;
   --scrim:rgba(0,0,0,.6); --shadow:0 10px 30px rgba(0,0,0,.5); color-scheme:dark }}
 :root[data-theme="dark"]{
   --bg:#0C0E12; --surface:#161920; --sunk:#1D2129; --ink:#E8EBF1; --muted:#8C94A3; --line:#272B35;
-  --accent:#7D8CFF; --accent-ink:#0C0E12; --accent-soft:#232A55;
+  --accent:#7D8CFF; --accent-ink:#0C0E12; --accent-soft:#232A55; --track:#1A1D24; --raise:#2C313C;
   --hl:#3B3412; --hl-ink:#FFE27A; --due:#FF7A5E; --due-soft:#3A1E18; --ok:#4FD39A;
   --c1:#FF7A5E; --c2:#FFB547; --c3:#4FD39A; --c4:#4CC3EC; --c5:#B192FF; --c6:#FF7CC8;
   --scrim:rgba(0,0,0,.6); --shadow:0 10px 30px rgba(0,0,0,.5); color-scheme:dark }
@@ -48,9 +49,9 @@ button{cursor:pointer}
 /* Keyboard open: the visible area is roughly half the screen. Drop the chrome you don't need while typing
    (logo row, type filters, Up next) so the feed keeps real room to scroll. The tag row stays: it shows where the entry is going.
    The composer is capped and scrolls on its own, so it can never push the feed off screen. */
-:root.kb .top,:root.kb #rail,:root.kb #next{display:none!important}
+:root.kb .top,:root.kb #rail,:root.kb #next,:root.kb #scope{display:none!important}
 :root.kb .search{padding-top:8px}
-:root.kb #tagrail{padding-top:8px}
+:root.kb #tagrow{padding-top:8px}
 :root.kb .composer{max-height:calc(var(--vvh,100dvh)*.5);overflow-y:auto;overscroll-behavior:contain;padding-block:6px 8px;gap:6px;grid-auto-rows:max-content}
 .sugg{flex:none;min-height:max-content}
 
@@ -65,13 +66,44 @@ button{cursor:pointer}
 .search{padding-block:0 6px}
 .search input{width:100%;box-sizing:border-box;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px}
 
-.rail{display:flex;gap:6px;overflow-x:auto;padding-block:4px 8px;scrollbar-width:none}
+.rail{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
 .rail::-webkit-scrollbar{display:none}
-.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums}
-.chip b{font-weight:500;color:var(--muted);margin-left:4px}
-.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.chip[aria-pressed="true"] b{color:inherit;opacity:.7}
-.chip.tagchip{background:var(--hl);color:var(--hl-ink);border-color:transparent}
+
+/* Filters come in two clearly different shapes:
+   1. "views": one segmented switch. Pick exactly one: All, Notes, Lists or Reminders.
+   2. tag pills: optional, narrow whatever view you are in to one #tag.
+   Whenever a tag, Pinned or a search narrows the view, the scope bar says so and offers one tap back to everything. */
+.views{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px;background:var(--track);border-radius:999px;padding:3px;margin-block:2px 10px}
+.views button{border:0;background:none;border-radius:999px;min-height:34px;padding:0 4px;font-size:13px;font-weight:500;color:var(--muted);white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:5px;min-width:0;font-variant-numeric:tabular-nums;transition:background .15s,color .15s}
+.views button b{font-weight:500;font-size:11.5px;opacity:.8}
+@media (max-width:400px){.views button{font-size:12.5px;gap:4px;padding:0 2px}.views button b{font-size:11px}}
+@media (max-width:350px){.views button b{display:none}}
+.views button:hover{color:var(--ink)}
+.views button[aria-pressed="true"]{background:var(--raise);color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(20,24,40,.14)}
+.tagrow{display:flex;align-items:center;gap:6px;margin-block:0 8px}
+.tagrow .rail{flex:1;min-width:0;padding-block:2px;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 18px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 18px),transparent);padding-right:18px}
+.tg{flex:none;display:inline-flex;align-items:center;height:30px;max-width:190px;border:1px solid var(--line);background:transparent;border-radius:999px;padding:0 11px;font-size:13px;font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums}
+.tg .h{color:var(--muted);margin-right:1px}
+.tg .nm{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.tg b{font-weight:500;font-size:11.5px;color:var(--muted);margin-left:6px}
+.tg.zero{color:var(--muted)}
+.tg:hover{border-color:var(--muted)}
+.tg[aria-pressed="true"]{background:var(--hl);color:var(--hl-ink);border-color:transparent;font-weight:600;padding-right:6px}
+.tg[aria-pressed="true"] .h{color:inherit;opacity:.6}
+.tg .x{display:grid;place-items:center;width:18px;height:18px;margin-left:5px;border-radius:50%;background:rgba(0,0,0,.1)}
+.tg .x svg{width:10px;height:10px}
+.tg.pinchip svg.pi{width:13px;height:13px;margin-right:4px;color:var(--accent)}
+.tg.pinchip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.tg.pinchip[aria-pressed="true"] svg.pi{color:inherit}
+.tagadd{flex:none;display:inline-flex;align-items:center;gap:3px;height:30px;border:1px dashed var(--line);background:transparent;color:var(--accent);border-radius:999px;padding:0 10px 0 8px;font-size:13px;font-weight:600}
+.tagadd svg{width:14px;height:14px}
+.tagadd:hover{border-color:var(--accent)}
+.tagempty{font-size:12.5px;color:var(--muted);align-self:center;white-space:nowrap}
+.scope{display:flex;align-items:center;gap:2px;margin-block:0 8px;padding:3px 3px 3px 12px;min-height:38px;box-sizing:border-box;border-radius:12px;background:var(--accent-soft);font-size:13px}
+.scope p{flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.scope p b{font-weight:600}
+.scope button{flex:none;border:0;background:none;color:var(--accent);font-weight:600;font-size:13px;padding:7px 9px;border-radius:9px;white-space:nowrap}
+.scope button:hover{background:var(--surface)}
 
 .next{display:flex;gap:10px;align-items:center;margin-block:0 8px;border:0;width:100%;text-align:left;background:var(--accent-soft);color:var(--ink);border-radius:12px;padding:9px 12px}
 .next small{font-family:var(--f-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:500;flex:none}
@@ -79,15 +111,6 @@ button{cursor:pointer}
 .next time{font-family:var(--f-mono);font-size:12px;color:var(--muted);flex:none}
 
 /* tags */
-.rail{padding-block:2px 4px}
-.rail.tags{padding-block:0 8px}
-.chip.tg{background:transparent;border-color:var(--line);color:var(--muted)}
-.chip.tg b{opacity:.8}
-.chip.tg[aria-pressed="true"]{background:var(--hl);color:var(--hl-ink);border-color:transparent}
-.chip.tg[aria-pressed="true"] b{color:inherit}
-.chip.pinchip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.chip.newtag{border-style:dashed;color:var(--accent);font-weight:600}
-.chip.mng{padding:6px 10px;color:var(--muted)}
 /* color dot inside a tag that has a chosen color */
 .dot{display:inline-block;flex:none;width:8px;height:8px;border-radius:50%;background:var(--tc,var(--muted));margin-right:6px;vertical-align:1px}
 .tag .dot{width:7px;height:7px;margin-right:4px;vertical-align:1px}
@@ -111,7 +134,8 @@ button{cursor:pointer}
 .day{font-family:var(--f-display);font-weight:600;font-size:13px;color:var(--muted);text-align:center;margin-block:8px 0;letter-spacing:.01em}
 .banner{background:var(--surface);border:1px dashed var(--line);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--muted);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .banner button{border:0;background:none;color:var(--accent);font-weight:600;padding:0}
-.empty{margin:auto;text-align:center;color:var(--muted);max-width:30ch;padding:30px 0}
+.empty{margin:auto;text-align:center;color:var(--muted);max-width:32ch;padding:30px 0}
+.empty .btn{margin-top:14px}
 .empty h2{font-family:var(--f-display);color:var(--ink);font-size:20px;margin:0 0 6px}
 
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px 12px 14px;display:grid;gap:6px;min-width:0}
@@ -211,12 +235,16 @@ textarea#ta:focus{outline:none;border-color:var(--accent)}
     <div class="top">
       <h1 class="logo">Offload<i aria-hidden="true"></i></h1>
       <span class="sp"></span>
-      <button class="ib" id="bSearch" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+      <button class="ib" id="bSearch" aria-label="Search (press /)" aria-expanded="false" aria-controls="searchRow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
       <button class="ib" id="bSettings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
     </div>
     <div class="search" id="searchRow" hidden><input id="q" type="search" placeholder="Search everything you've saved" autocomplete="off"></div>
-    <nav class="rail" id="rail" aria-label="Show"></nav>
-    <nav class="rail tags" id="tagrail" aria-label="Tags" hidden></nav>
+    <nav class="views" id="rail" aria-label="Show"></nav>
+    <div class="tagrow" id="tagrow">
+      <nav class="rail" id="tagrail" aria-label="Filter by tag"></nav>
+      <button class="tagadd" id="tagAdd" aria-label="New tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Tag</button>
+    </div>
+    <div class="scope" id="scope" hidden role="status"></div>
     <button class="next" id="next" hidden></button>
   </header>
 
@@ -319,7 +347,7 @@ const ui={tagColor:null,tagEdit:null,filter:'all',tag:null,pinned:false,q:'',mod
 
 /* ---------- storage ---------- */
 function load(){try{const r=localStorage.getItem(KEY);if(r){const v=JSON.parse(r);if(v&&Array.isArray(v.items))return v}}catch(e){}return null}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){toast("Couldn't save: this device's storage is full or blocked. Copy a backup from Settings.");return false}}
 const uid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36);
 
 function seed(){
@@ -348,7 +376,17 @@ function rich(s){
   return h;
 }
 const tagsOf=s=>[...new Set(((s||'').match(/(?:^|\s)#[\p{L}\p{N}_-]+/gu)||[]).map(t=>t.trim().slice(1).toLowerCase()))];
-const fullText=it=>[it.text||'',...(it.items||[]).map(x=>x.t)].join('\n');
+/* Entries from older versions or hand-edited backups can carry an unknown type or miss fields.
+   Read them defensively (without rewriting what is stored) so one odd entry can never hide the rest. */
+const KINDS=['note','list','reminder'];
+const kindOf=it=>KINDS.includes(it.type)?it.type:Array.isArray(it.items)?'list':Number.isFinite(+it.due)&&it.due?'reminder':'note';
+const listOf=it=>Array.isArray(it.items)?it.items:[];
+const itemText=x=>x&&x.t!=null?String(x.t):'';
+const dueOf=it=>Number.isFinite(+it.due)&&it.due?+it.due:null;
+const fullText=it=>[it.text||'',...listOf(it).map(itemText)].join('\n');
+const NOUN={all:['entry','entries'],note:['note','notes'],list:['list','lists'],reminder:['reminder','reminders']};
+const X_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+const PIN_ICON='<svg class="pi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6l-1 6 3 3H7l3-3-1-6zM12 13v7"/></svg>';
 const startOf=t=>{const d=new Date(t);d.setHours(0,0,0,0);return d.getTime()};
 const fT=t=>new Date(t).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
 function dayLabel(t){const d=(startOf(Date.now())-startOf(t))/DAY;
@@ -388,69 +426,98 @@ function applySettings(){
 }
 
 /* ---------- render ---------- */
-function visible(){
-  const q=ui.q.trim().toLowerCase();
-  return S.items.filter(it=>{
-    if(ui.pinned&&!it.pinned)return false;
-    if(ui.filter!=='all'&&it.type!==ui.filter)return false;
-    if(ui.tag&&!tagsOf(fullText(it)).includes(ui.tag))return false;
-    if(q&&!fullText(it).toLowerCase().includes(q))return false;
-    return true;
-  });
+/* One rule for every filter, so the numbers on the controls always match what the feed shows.
+   Pass overrides to ask "what would match if this one filter were different?" */
+function matches(it,o){
+  o=Object.assign({filter:ui.filter,tag:ui.tag,pinned:ui.pinned,q:ui.q},o);
+  const q=(o.q||'').trim().toLowerCase();
+  if(o.pinned&&!it.pinned)return false;
+  if(o.filter!=='all'&&kindOf(it)!==o.filter)return false;
+  if(o.tag&&!tagsOf(fullText(it)).includes(o.tag))return false;
+  if(q&&!fullText(it).toLowerCase().includes(q))return false;
+  return true;
 }
+const visible=()=>S.items.filter(it=>it&&matches(it));
+const narrowed=()=>!!(ui.tag||ui.pinned||ui.q.trim());
+function clearNarrowing(){ui.tag=null;ui.pinned=false;ui.q='';$('#q').value='';$('#searchRow').hidden=true;$('#bSearch').setAttribute('aria-expanded','false');setMode(ui.mode);render()}
 function renderRail(){
-  const c={all:S.items.length,note:0,list:0,reminder:0};let pins=0;
-  S.items.forEach(it=>{c[it.type]++;if(it.pinned)pins++});
+  const items=S.items.filter(Boolean);
+  /* view counts respect the tag, Pinned and search that are on right now */
+  const c={all:0,note:0,list:0,reminder:0};
+  items.forEach(it=>{if(matches(it,{filter:'all'})){c.all++;c[kindOf(it)]++}});
   const f=[['all','All'],['note','Notes'],['list','Lists'],['reminder','Reminders']];
-  const rail=$('#rail'),keep=rail.scrollLeft;
-  rail.innerHTML=f.map(([k,l])=>`<button class="chip" data-f="${k}" aria-pressed="${ui.filter===k}">${l}<b>${c[k]}</b></button>`).join('');rail.scrollLeft=keep;
+  $('#rail').innerHTML=f.map(([k,l])=>`<button data-f="${k}" aria-pressed="${ui.filter===k}" aria-label="${l}, ${c[k]}">${l}<b aria-hidden="true">${c[k]}</b></button>`).join('');
+
+  /* tag pills: order stays stable (most used overall), counts follow the current view */
   const tags=sortedTags();if(ui.tag&&!tags.some(x=>x[0]===ui.tag))ui.tag=null;
-  if(!pins&&ui.pinned)ui.pinned=false;
-  let h=pins?`<button class="chip pinchip" data-pin="1" aria-pressed="${ui.pinned}">📌 Pinned<b>${pins}</b></button>`:'';
-  h+=tags.map(([t,n])=>`<button class="chip tg" data-t="${esc(t)}" aria-pressed="${ui.tag===t}">${dotHtml(t)}#${esc(t)}<b>${n}</b></button>`).join('');
-  h=h.replace(/(<button class="chip tg"[^>]*aria-pressed="true"[^>]*>.*?<\/button>)/,`$1<button class="chip mng" data-manage="1" aria-label="Rename or delete #${esc(ui.tag||'')}">⋯</button>`);
-  h=`<button class="chip newtag" data-new="1">+ New tag</button>`+h;
-  const tr=$('#tagrail'),k2=tr.scrollLeft;tr.hidden=false;tr.innerHTML=h;tr.scrollLeft=k2;
-  const nx=S.items.filter(i=>i.type==='reminder'&&!i.done).sort((a,b)=>a.due-b.due)[0];
+  const pinsAll=items.filter(i=>i.pinned).length;if(!pinsAll&&ui.pinned)ui.pinned=false;
+  const scoped={};let pins=0;
+  items.forEach(it=>{if(matches(it,{tag:null}))tagsOf(fullText(it)).forEach(t=>scoped[t]=(scoped[t]||0)+1);if(it.pinned&&matches(it,{pinned:true}))pins++});
+  let h=pinsAll?`<button class="tg pinchip" data-pin="1" aria-pressed="${ui.pinned}" aria-label="${ui.pinned?'Stop showing only pinned':'Show only pinned, '+pins}">${PIN_ICON}Pinned${ui.pinned?`<span class="x">${X_ICON}</span>`:`<b>${pins}</b>`}</button>`:'';
+  h+=tags.map(([t])=>{const n=scoped[t]||0,on=ui.tag===t;
+    return `<button class="tg${n||on?'':' zero'}" data-t="${esc(t)}" aria-pressed="${on}" aria-label="${on?'Remove #'+esc(t)+' filter':'Show #'+esc(t)+', '+n}">${dotHtml(t)}<span class="h">#</span><span class="nm">${esc(t)}</span>${on?`<span class="x">${X_ICON}</span>`:`<b>${n}</b>`}</button>`}).join('');
+  if(!h)h='<span class="tagempty">Add #work or #ideas to any entry to start organizing.</span>';
+  const tr=$('#tagrail'),k2=tr.scrollLeft;tr.innerHTML=h;tr.scrollLeft=k2;
+  const sel=tr.querySelector('[aria-pressed="true"]');
+  if(sel&&(sel.offsetLeft<tr.scrollLeft||sel.offsetLeft+sel.offsetWidth>tr.scrollLeft+tr.clientWidth))tr.scrollLeft=Math.max(0,sel.offsetLeft-12);
+
+  /* scope bar: say exactly why the feed is shorter than the tab suggests */
+  const sc=$('#scope');
+  if(narrowed()){
+    const shown=visible().length,total=ui.filter==='all'?items.length:items.filter(i=>kindOf(i)===ui.filter).length;
+    const why=[];if(ui.tag)why.push(`in <b>#${esc(ui.tag)}</b>`);if(ui.pinned)why.push('<b>pinned</b>');if(ui.q.trim())why.push(`matching <b>“${esc(ui.q.trim())}”</b>`);
+    sc.innerHTML=`<p>${shown} of ${total} ${NOUN[ui.filter][total===1?0:1]} · ${why.join(', ')}</p>${ui.tag?'<button data-scope="edit">Edit tag</button>':''}<button data-scope="clear">Show all</button>`;
+    sc.hidden=false;
+  }else sc.hidden=true;
+
+  const nx=items.filter(i=>kindOf(i)==='reminder'&&!i.done&&dueOf(i)).sort((a,b)=>dueOf(a)-dueOf(b))[0];
   const n=$('#next');
-  if(nx&&ui.filter!=='reminder'&&ui.filter!=='note'&&ui.filter!=='list'){n.hidden=false;n.dataset.id=nx.id;
-    n.innerHTML=`<small>${nx.due<Date.now()?'Overdue':'Up next'}</small><span>${esc(nx.text.replace(/(^|\s)#[\p{L}\p{N}_-]+/gu,'').trim())}</span><time>${dueLabel(nx.due)}</time>`}
+  if(nx&&ui.filter==='all'&&!narrowed()){n.hidden=false;n.dataset.id=nx.id;
+    n.innerHTML=`<small>${dueOf(nx)<Date.now()?'Overdue':'Up next'}</small><span>${esc((nx.text||'').replace(/(^|\s)#[\p{L}\p{N}_-]+/gu,'').trim()||'Reminder')}</span><time>${dueLabel(dueOf(nx))}</time>`}
   else n.hidden=true;
 }
 const PENCIL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="m13.5 6.5 4 4"/></svg>';
 const TRASH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
 function card(it){
-  const now=Date.now();let kind,body;
-  if(it.type==='list'){
-    const n=it.items.length,d=it.items.filter(x=>x.done).length;kind=`List · ${d}/${n}`;
+  const now=Date.now(),type=kindOf(it);let kind,body;
+  if(type==='list'){
+    const li=listOf(it),n=li.length,d=li.filter(x=>x&&x.done).length;kind=`List · ${d}/${n}`;
     body=`${it.text?`<div class="txt ttl">${rich(it.text)}</div>`:''}<div class="bar"><i style="width:${n?d/n*100:0}%"></i></div>
-    <ul class="chk">${it.items.map((x,i)=>`<li><label><input type="checkbox" data-i="${i}" ${x.done?'checked':''}><span>${rich(x.t)}</span></label></li>`).join('')}</ul>`;
-  }else if(it.type==='reminder'){
-    const late=!it.done&&it.due<now;kind='Reminder';
+    <ul class="chk">${li.map((x,i)=>`<li><label><input type="checkbox" data-i="${i}" ${x&&x.done?'checked':''}><span>${rich(itemText(x))}</span></label></li>`).join('')}</ul>`;
+  }else if(type==='reminder'){
+    const due=dueOf(it),late=!it.done&&due&&due<now;kind='Reminder';
     body=`<div class="rem"><button class="tick" data-act="done" aria-label="${it.done?'Mark not done':'Mark done'}"></button>
       <div style="min-width:0"><div class="txt">${rich(it.text)}</div>
-      <div class="when ${late?'late':''}">${late?'<span class="late-pill">Overdue</span>':''}${it.done?'Done · ':''}${dueLabel(it.due)}${it.repeat&&it.repeat.length?' · '+repLabel(it.repeat):''}</div>
+      <div class="when ${late?'late':''}">${late?'<span class="late-pill">Overdue</span>':''}${it.done?'Done · ':''}${due?dueLabel(due):'No time set'}${it.repeat&&it.repeat.length?' · '+repLabel(it.repeat):''}</div>
       <button class="calbtn${it.cal?' sent':''}" data-act="cal">${CAL_ICON}${it.cal?'Sent to Calendar · Add again':'Add to Calendar'}</button></div></div>`;
   }else{kind='Note';body=`<div class="txt">${rich(it.text)}</div>`}
-  return `<article class="card t-${it.type}${it.done?' is-done':''}" data-id="${it.id}">
+  return `<article class="card t-${type}${it.done?' is-done':''}" data-id="${it.id}">
     <div class="meta"><span class="kind">${kind}</span>${it.pinned?'<span class="pin">● Pinned</span>':''}<span class="sp"></span><time>${fT(it.created)}</time><button class="more" aria-label="Options">⋯</button></div>${body}</article>`;
 }
 function render(scroll){
   renderRail();
   const feed=$('#feed');let list=visible(),h='';
+  const safeCard=it=>{try{return card(it)}catch(e){return `<article class="card" data-id="${esc(it.id||'')}"><div class="txt">${esc(fullText(it))}</div></article>`}};
   const home=ui.filter==='all'&&!ui.tag&&!ui.q&&!ui.pinned;
   if(home&&S.items.some(i=>i.ex))h+=`<div class="banner"><span>These are example entries so you can see how it works.</span><button data-x="clearex">Remove examples</button></div>`;
   if(ui.filter==='reminder'){
-    list.sort((a,b)=>(a.done-b.done)||(a.due-b.due));
-    h+=list.map(card).join('');
+    const d=x=>dueOf(x)||Infinity;
+    list.sort((a,b)=>((a.done?1:0)-(b.done?1:0))||(d(a)-d(b)));
+    h+=list.map(safeCard).join('');
   }else{
-    list.sort((a,b)=>a.created-b.created);let last='';
-    list.forEach(it=>{const l=dayLabel(it.created);if(l!==last){h+=`<div class="day">${l}</div>`;last=l}h+=card(it)});
+    list.sort((a,b)=>(+a.created||0)-(+b.created||0));let last='';
+    list.forEach(it=>{const l=dayLabel(+it.created||Date.now());if(l!==last){h+=`<div class="day">${l}</div>`;last=l}h+=safeCard(it)});
   }
   if(!list.length){
-    h+= (ui.q||ui.tag||ui.pinned||ui.filter!=='all')
-      ?`<div class="empty"><h2>Nothing here</h2>No entries match this view. Try another filter or clear your search.</div>`
-      :`<div class="empty"><h2>Get it out of your head</h2>Type anything below: an idea, a link, a list, a reminder. Add a #tag like #work to group it.</div>`;
+    const kinds=NOUN[ui.filter][1];let t,m,act='';
+    if(ui.q.trim()){t='No matches found.';m='Try another keyword or clear your search.';act='Clear search'}
+    else if(ui.tag){t=`No ${ui.filter==='all'?'entries':kinds} in #${esc(ui.tag)} yet`;m=`While #${esc(ui.tag)} is selected, new entries you save get it automatically.`;act=`Show all ${kinds}`}
+    else if(ui.pinned){t=`No pinned ${kinds}`;m='Pin an entry from its ⋯ menu to keep it here.';act=`Show all ${kinds}`}
+    else if(ui.filter==='reminder'){t='Nothing scheduled.';m='Your upcoming reminders will appear here. Choose Reminder below to add one.'}
+    else if(ui.filter==='list'){t='No lists yet.';m='Choose List below and type one item per line.'}
+    else if(ui.filter==='note'){t='No notes yet.';m='Type anything below to save a note.'}
+    else{t='Your mind, unloaded.';m='Capture a thought, save an idea, or make a quick list. You can organize it later.'}
+    h+=`<div class="empty"><h2>${t}</h2>${m}${act?`<br><button class="btn" data-scope="clear">${act}</button>`:''}</div>`;
   }
   feed.innerHTML=h;
   if(scroll!==false)requestAnimationFrame(()=>feed.scrollTop=ui.filter==='reminder'?0:feed.scrollHeight);
@@ -472,7 +539,7 @@ function resetComposer(){ta.value='';ui.editing=null;ui.repeat=[];$('#editing').
 function parseList(raw,old){
   let lines=raw.split('\n').map(s=>s.trim()).filter(Boolean),title='';
   if(lines.length>1&&/:$/.test(lines[0])){title=lines.shift().replace(/:$/,'')}
-  const prev={};(old||[]).forEach(x=>prev[x.t]=x.done);
+  const prev={};(old||[]).forEach(x=>{if(x)prev[itemText(x)]=x.done});
   return{title,items:lines.map(l=>{const t=l.replace(/^([-*•]|\[ ?x?\])\s*/i,'');return{t,done:!!prev[t]||/^\[x\]/i.test(l)}})};
 }
 function send(){
@@ -486,20 +553,20 @@ function send(){
     Object.assign(it,{type:'reminder',text:autoTag?raw+' #'+autoTag:raw,due:ui.repeat.length?nextOcc(due,ui.repeat,Date.now()-1):due,repeat:[...ui.repeat],done:false,notified:0});
     delete it.items;
   }else if(ui.mode==='list'){
-    const p=parseList(raw,it.items);Object.assign(it,{type:'list',text:autoTag?(p.title+' #'+autoTag).trim():p.title,items:p.items});delete it.due;delete it.repeat;delete it.done;
+    const p=parseList(raw,listOf(it));Object.assign(it,{type:'list',text:autoTag?(p.title+' #'+autoTag).trim():p.title,items:p.items});delete it.due;delete it.repeat;delete it.done;
   }else{Object.assign(it,{type:'note',text:autoTag?raw+' #'+autoTag:raw});delete it.items;delete it.due;delete it.repeat;delete it.done}
   delete it.ex;
   let changed=false;
   if(it.type==='reminder'){changed=before!==JSON.stringify([it.text,it.due,it.repeat]);if(changed)delete it.cal}else delete it.cal;
   delete it.cat;
   if(isNew)S.items.push(it);
-  save();const wasEdit=!isNew;resetComposer();
+  if(!save()){if(isNew)S.items.pop();return}const wasEdit=!isNew;resetComposer();
   // never let a saved entry vanish: if it doesn't match the current view, widen the view
   const hidden=!visible().includes(it);
   if(hidden){if(ui.filter!=='all'&&ui.filter!==it.type)ui.filter='all';if(ui.tag&&!tagsOf(fullText(it)).includes(ui.tag))ui.tag=null;
     if(ui.pinned&&!it.pinned)ui.pinned=false;if(ui.q&&!fullText(it).toLowerCase().includes(ui.q.trim().toLowerCase())){ui.q='';$('#q').value=''}}
   if(!isNew){render(false);flash(it.id)}else{ui.pinned=false;render()}
-  toast(wasEdit?'Saved changes':it.type==='reminder'?'Reminder set for '+dueLabel(it.due):'Saved');
+  toast(wasEdit?'Saved changes':it.type==='reminder'?'Reminder set for '+dueLabel(it.due):autoTag?'Saved to #'+autoTag:'Saved');
   // must run inside the tap that saved it, or the phone blocks it
   if(it.type==='reminder'&&changed&&S.settings.autoCal)addToCalendar(it,true);
 }
@@ -582,10 +649,10 @@ function addToCalendar(it,auto){
 }
 function flash(id){const el=document.querySelector(`.card[data-id="${id}"]`);if(el){el.scrollIntoView({block:'center'});el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')}}
 function startEdit(it){
-  ui.editing=it.id;setMode(it.type);
-  if(it.type==='list')ta.value=(it.text?it.text+':\n':'')+it.items.map(x=>x.t).join('\n');
-  else ta.value=it.text;
-  if(it.type==='reminder'){$('#due').value=toInput(it.due);ui.repeat=[...(it.repeat||[])];renderDows()}
+  const type=kindOf(it);ui.editing=it.id;setMode(type);
+  if(type==='list')ta.value=(it.text?it.text+':\n':'')+listOf(it).map(itemText).join('\n');
+  else ta.value=it.text||'';
+  if(type==='reminder'){$('#due').value=toInput(dueOf(it)||roundUp(Date.now()+HR));ui.repeat=[...(it.repeat||[])];renderDows()}
   $('#editing').hidden=false;grow();ta.focus();
 }
 
@@ -595,7 +662,7 @@ function closeSheets(){$('#scrim').hidden=true;$$('.sheet').forEach(s=>s.hidden=
 function openItem(id){const it=find(id);if(!it)return;ui.itemId=id;
   $('#sPrev').textContent=fullText(it).slice(0,240);
   $('#itemSheet [data-a="pin"]').textContent=it.pinned?'Unpin':'Pin';
-  $('#itemSheet [data-a="cal"]').hidden=it.type!=='reminder';openSheet('#itemSheet')}
+  $('#itemSheet [data-a="cal"]').hidden=kindOf(it)!=='reminder'||!dueOf(it);openSheet('#itemSheet')}
 
 
 /* ---------- reminders ---------- */
@@ -614,7 +681,7 @@ async function notify(it){
 }
 function tick(){
   const now=Date.now();let hit=false;
-  S.items.forEach(it=>{if(it.type==='reminder'&&!it.done&&it.due<=now&&it.notified!==it.due){it.notified=it.due;hit=true;toast('⏰ '+it.text.slice(0,80));notify(it)}});
+  S.items.forEach(it=>{if(it&&kindOf(it)==='reminder'&&!it.done&&dueOf(it)&&it.due<=now&&it.notified!==it.due){it.notified=it.due;hit=true;toast('⏰ '+(it.text||'Reminder').slice(0,80));notify(it)}});
   if(hit){save()}
   if(hit||!tick.n||now-tick.n>60e3){tick.n=now;render(false)}
 }
@@ -633,27 +700,33 @@ $('#remopts').addEventListener('click',e=>{const b=e.target.closest('.q');if(!b)
   if(b.dataset.q==='tmrw'){n.setDate(n.getDate()+1);n.setHours(9,0,0,0)}
   $('#due').value=toInput(n.getTime())});
 
-$('#rail').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b||!b.dataset.f)return;ui.filter=b.dataset.f;setMode(ui.mode);render()});
-$('#tagrail').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;
-  if(b.dataset.new){openTag(null);return}
-  if(b.dataset.manage){openTag(ui.tag);return}
+$('#rail').addEventListener('click',e=>{const b=e.target.closest('button[data-f]');if(!b)return;ui.filter=b.dataset.f;setMode(ui.mode);render()});
+$('#tagAdd').addEventListener('click',()=>openTag(null));
+$('#scope').addEventListener('click',e=>{const b=e.target.closest('[data-scope]');if(!b)return;if(b.dataset.scope==='edit')openTag(ui.tag);else clearNarrowing()});
+$('#tagrail').addEventListener('click',e=>{const b=e.target.closest('.tg');if(!b)return;
   if(b.dataset.pin)ui.pinned=!ui.pinned;else ui.tag=ui.tag===b.dataset.t?null:b.dataset.t;
   const added=!b.dataset.pin&&ui.tag&&tagDraft(ui.tag);
   setMode(ui.mode);render();if(added)toast('Added #'+ui.tag+'. Save to keep it.')});
 $('#next').addEventListener('click',()=>{const id=$('#next').dataset.id;ui.filter='all';ui.tag=null;ui.pinned=false;ui.q='';$('#q').value='';render(false);flash(id)});
-$('#bSearch').addEventListener('click',()=>{const r=$('#searchRow');r.hidden=!r.hidden;if(!r.hidden)$('#q').focus();else{ui.q='';$('#q').value='';render()}});
+function toggleSearch(open){const r=$('#searchRow');r.hidden=!open;$('#bSearch').setAttribute('aria-expanded',String(open));if(open)$('#q').focus();else if(ui.q){ui.q='';$('#q').value='';render()}}
+$('#bSearch').addEventListener('click',()=>toggleSearch($('#searchRow').hidden));
+$('#q').addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();toggleSearch(false);$('#bSearch').focus()}});
+/* "/" jumps to search, unless you're typing somewhere */
+document.addEventListener('keydown',e=>{if(e.key!=='/'||e.ctrlKey||e.metaKey||e.altKey||ui.sheet)return;const t=e.target;
+  if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;e.preventDefault();toggleSearch(true)});
 $('#q').addEventListener('input',e=>{ui.q=e.target.value;render()});
 
 $('#feed').addEventListener('click',e=>{
-  const tg=e.target.closest('.tag');if(tg){ui.tag=ui.tag===tg.dataset.tag?null:tg.dataset.tag;setMode(ui.mode);render();return}
+  const tg=e.target.closest('.tag');if(tg){ui.tag=ui.tag===tg.dataset.tag?null:tg.dataset.tag;setMode(ui.mode);render();toast(ui.tag?'Showing only #'+ui.tag:'Tag filter removed');return}
+  if(e.target.closest('[data-scope="clear"]')){clearNarrowing();return}
   if(e.target.closest('[data-x="clearex"]')){S.items=S.items.filter(i=>!i.ex);save();render();toast('Examples removed');return}
-  const c=e.target.closest('.card');if(!c)return;const it=find(c.dataset.id);
+  const c=e.target.closest('.card');if(!c)return;const it=find(c.dataset.id);if(!it)return;
   if(e.target.closest('.more')){openItem(it.id);return}
   if(e.target.closest('[data-act="done"]')){complete(it);return}
   if(e.target.closest('[data-act="cal"]')){addToCalendar(it);return}
 });
 $('#feed').addEventListener('change',e=>{const cb=e.target.closest('.chk input');if(!cb)return;
-  const it=find(cb.closest('.card').dataset.id);it.items[+cb.dataset.i].done=cb.checked;delete it.ex;save();render(false)});
+  const it=find(cb.closest('.card').dataset.id),x=it&&listOf(it)[+cb.dataset.i];if(!x)return;x.done=cb.checked;delete it.ex;save();render(false)});
 
 $('#scrim').addEventListener('click',closeSheets);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ui.sheet)closeSheets()});
@@ -757,7 +830,7 @@ document.addEventListener('keydown',e=>{
   // while typing, arrows/Space/Home/End belong to the text; only Page Up/Down scroll
   if(typing&&e.key!=='PageDown'&&e.key!=='PageUp')return;
   // Space and arrows on a button or checkbox keep their normal meaning
-  if(!typing&&t&&t.closest&&t.closest('button,input,select,a,[role="radio"]')&&(e.key===' '||t.closest('.rail,.seg,.swatches,.sugg')))return;
+  if(!typing&&t&&t.closest&&t.closest('button,input,select,a,[role="radio"]')&&(e.key===' '||t.closest('.rail,.views,.seg,.swatches,.sugg')))return;
   const box=ui.sheet?$(ui.sheet):$('#feed');if(!box)return;
   const page=box.clientHeight*.85,line=48;
   const d={ArrowDown:line,ArrowUp:-line,PageDown:page,PageUp:-page,' ':e.shiftKey?-page:page}[e.key];
@@ -775,7 +848,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
 
 /* ---------- boot ---------- */
 const stored=load();
-if(stored){S=stored;if('sync' in S||'siriHintSeen' in S){delete S.sync;delete S.siriHintSeen;save()}S.tags=Array.isArray(S.tags)?S.tags:[];S.tagColors=S.tagColors&&typeof S.tagColors==='object'?S.tagColors:{};
+if(stored){S=stored;S.items=S.items.filter(i=>i&&typeof i==='object');if('sync' in S||'siriHintSeen' in S){delete S.sync;delete S.siriHintSeen;save()}S.tags=Array.isArray(S.tags)?S.tags:[];S.tagColors=S.tagColors&&typeof S.tagColors==='object'?S.tagColors:{};
   /* categories were folded into #tags: carry existing entries over once */
   if('cats' in S||'catsSeeded' in S||S.items.some(i=>i.cat)){migrateCats(S.items,S.cats);delete S.cats;delete S.catsSeeded;save()}
   S.settings=Object.assign({theme:'system',font:'sans',autoCal:IS_IOS},S.settings||{})}else{seed();S.settings.autoCal=IS_IOS;save()}
