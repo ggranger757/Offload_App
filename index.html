@@ -427,8 +427,8 @@ textarea#ta:focus{outline:none;border-color:var(--muted)}
   <div class="seg" id="segFont"><button data-v="sans">Sans</button><button data-v="serif">Serif</button><button data-v="mono">Mono</button></div>
   <h4>Reminders</h4>
   <label class="toggle" for="autoCal"><input type="checkbox" id="autoCal"><span>Add new reminders to my Calendar<small id="autoCalNote">After you save a reminder, your phone's "Add to Calendar" screen opens with it filled in. Tap Add, and your phone alerts you even when Offload is closed.</small></span></label>
-  <div class="btns" style="margin-top:12px"><button class="btn" id="bNotif">Turn on notifications</button></div>
-  <p class="note" id="notifNote">Reminders always show inside the app. Notifications also alert you while the app is open in the background.</p>
+  <label class="toggle" for="notifOn" style="margin-top:14px"><input type="checkbox" id="notifOn"><span>Notifications<small id="notifNote">Alert me when a reminder is due while Offload is open or in the background.</small></span></label>
+  <div class="btns" id="notifTestRow" style="margin-top:10px" hidden><button class="btn" id="bNotifTest">Send a test notification</button></div>
   <h4>Export</h4>
   <p class="note" style="margin:0 0 10px">Save a copy of all your entries, tags and tag colors. Keep it somewhere safe, or open it on another device with Import.</p>
   <div class="btns"><button class="btn primary" id="bDownload">Export backup file</button><button class="btn" id="bExport">Copy to clipboard</button></div>
@@ -441,7 +441,7 @@ textarea#ta:focus{outline:none;border-color:var(--muted)}
   <div class="btns"><button class="btn" id="bImport">Import pasted backup</button></div>
   <h4>Data</h4>
   <div class="btns"><button class="btn" id="bClearEx">Remove examples</button><button class="btn danger" id="bWipe">Delete everything</button></div>
-  <p class="note build">Offload · build 2026-10-28 20:24</p>
+  <p class="note build">Offload · build 2026-10-28 20:29</p>
 </div>
 
 
@@ -836,11 +836,16 @@ function complete(it){
   else it.done=true;
   save();render(false);
 }
+const notifSupported=()=>'Notification' in window;
+const notifActive=()=>notifSupported()&&Notification.permission==='granted'&&S.settings.notify!==false;
+async function showNote(title,body,tag){
+  const reg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();
+  if(reg)await reg.showNotification(title,{body,icon:'icons/icon-192.png',tag});else new Notification(title,{body,tag});
+}
 async function notify(it){
-  const title='Reminder',body=it.text;
-  try{if('Notification' in window&&Notification.permission==='granted'){
-    const reg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();
-    if(reg)reg.showNotification(title,{body,icon:'icons/icon-192.png',tag:it.id});else new Notification(title,{body});
+  const title='Reminder',body=(it.text||'').replace(/(^|\s)#[\p{L}\p{N}_-]+/gu,'').trim()||'Reminder';
+  try{if(notifActive()){
+    await showNote(title,body,it.id);
   }}catch(e){}
 }
 function tick(){
@@ -935,11 +940,36 @@ $('#autoCal').addEventListener('change',e=>{S.settings.autoCal=e.target.checked;
 if(!IS_IOS)$('#autoCalNote').textContent='After you save a reminder, Offload saves a calendar file. Open it to add the reminder to your calendar with an alert.';
 $('#segTheme').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.settings.theme=b.dataset.v;save();applySettings()});
 $('#segFont').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.settings.font=b.dataset.v;save();applySettings()});
-function updNotif(){const b=$('#bNotif'),n=$('#notifNote');
-  if(!('Notification' in window)){b.disabled=true;b.textContent='Notifications unavailable';return}
-  if(Notification.permission==='granted'){b.disabled=true;b.textContent='Notifications on'}
-  else if(Notification.permission==='denied'){b.disabled=true;b.textContent='Notifications blocked';n.textContent='Notifications are blocked for this site. You can allow them in your browser settings. Reminders still show inside the app.'}}
-$('#bNotif').addEventListener('click',async()=>{try{const p=await Notification.requestPermission();if(p!=='granted')toast('Notifications were not allowed. Reminders will still show in the app.')}catch(e){toast('This browser view does not allow notifications.')}updNotif()});
+/* Notifications: a real on/off switch. The browser's permission is asked the first time it's turned on;
+   after that the switch just mutes or unmutes Offload's own alerts. */
+function updNotif(){
+  const sw=$('#notifOn'),n=$('#notifNote'),test=$('#notifTestRow');
+  sw.disabled=false;test.hidden=true;
+  if(!notifSupported()){
+    sw.checked=false;sw.disabled=true;
+    n.textContent=IS_IOS&&!STANDALONE?'On iPhone, notifications work once Offload is on your Home Screen: tap Share, then Add to Home Screen, and open it from there.':'This browser does not support notifications. Reminders still show inside the app.';
+    return}
+  const perm=Notification.permission;
+  if(perm==='denied'){sw.checked=false;sw.disabled=true;
+    n.textContent='Notifications are blocked for this site. To allow them, change the notification setting for this site in your browser or phone settings, then come back. Reminders still show inside the app.';return}
+  sw.checked=perm==='granted'&&S.settings.notify!==false;
+  test.hidden=!sw.checked;
+  n.textContent=sw.checked?'On. Offload alerts you when a reminder is due while it is open or in the background. For alerts when Offload is closed, add reminders to your Calendar.'
+    :'Off. Turn on to be alerted when a reminder is due while Offload is open or in the background.';
+}
+$('#notifOn').addEventListener('change',async e=>{
+  const on=e.target.checked;
+  if(!on){S.settings.notify=false;save();updNotif();toast('Notifications off');return}
+  if(Notification.permission!=='granted'){
+    let p='default';try{p=await Notification.requestPermission()}catch(err){}
+    if(p!=='granted'){updNotif();toast(p==='denied'?'Notifications were blocked. Reminders still show in the app.':'Notifications were not turned on.');return}
+  }
+  S.settings.notify=true;save();updNotif();toast('Notifications on');
+});
+$('#bNotifTest').addEventListener('click',async()=>{
+  try{await showNote('Offload','Notifications are working.','offload-test');toast('Test sent. If nothing appeared, check this site’s notification settings.')}
+  catch(e){toast("Couldn't send a notification from this browser.")}
+});
 /* ---------- backup: export (file or clipboard) and import (file or pasted text) ---------- */
 const backupJSON=()=>JSON.stringify({app:'offload',v:4,exported:new Date().toISOString(),tags:S.tags||[],tagColors:S.tagColors||{},items:S.items});
 const nEntries=n=>`${n} entr${n===1?'y':'ies'}`;
