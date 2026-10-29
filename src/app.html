@@ -202,11 +202,164 @@ textarea#ta:focus{outline:none;border-color:var(--accent)}
 .btn{border:1px solid var(--line);background:var(--surface);border-radius:12px;min-height:48px;padding:0 20px;font-weight:600;font-size:15px}
 .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .btn.danger{color:var(--due)}
+.btn:disabled{opacity:.45;cursor:default}
 .btns{display:flex;gap:12px;flex-wrap:wrap}
 .sheet textarea{width:100%;box-sizing:border-box;min-height:120px;border:1px solid var(--line);background:var(--sunk);border-radius:12px;padding:12px;font-family:var(--f-mono);font-size:12px;margin-bottom:12px}
 .note{font-size:13.5px;line-height:1.5;color:var(--muted);margin:10px 0 0;max-width:60ch}
 .toast{position:fixed;left:50%;bottom:calc(var(--cmp,120px) + 16px + var(--kb,0px) + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:14px 20px;border-radius:14px;font-size:14px;z-index:30;box-shadow:var(--shadow);max-width:calc(100% - 40px);text-align:center}
 :root.kb .toast{bottom:calc(var(--cmp,120px) + 16px + var(--kb,0px))}
+
+/* ---------- mind map: a full-screen, pannable map of tags → entries → list items ---------- */
+.mview{position:fixed;inset:0;z-index:15;background:var(--bg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
+.mbar{display:flex;align-items:center;gap:6px;padding-block:6px;border-bottom:1px solid var(--line);background:var(--surface)}
+.mbar h3{font-family:var(--f-display);font-size:20px;margin:0 0 0 2px;white-space:nowrap}
+.mbar .ib{margin-left:-10px}
+.seg.sm{padding:3px;border-radius:12px}
+.seg.sm button{min-height:38px;padding:0 14px;font-size:14px}
+.mcanvas{flex:1;position:relative;overflow:hidden;touch-action:none;cursor:grab;background-color:var(--bg);background-image:radial-gradient(var(--line) 1.1px,transparent 1.3px);background-size:24px 24px}
+.mcanvas.drag{cursor:grabbing}
+#msvg{position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.mzoom{position:absolute;right:var(--gr);bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.mzoom button{border:0;background:none;min-width:48px;height:48px;padding:0 12px;font-size:20px;font-weight:600;color:var(--ink)}
+.mzoom button+button{border-left:1px solid var(--line)}
+.mzoom #mFit{font-size:14px}
+.mhelp{position:absolute;left:var(--gl);bottom:calc(20px + env(safe-area-inset-bottom,0px));right:200px;margin:0;font-size:12.5px;line-height:1.4;color:var(--muted);pointer-events:none}
+.mm-n{cursor:pointer}
+.mm-n text{font-family:var(--f-body);fill:var(--ink)}
+.mm-hit{fill:transparent}
+.mm-rootbox{fill:var(--ink)}
+.mm-n .mm-rt{font-family:var(--f-display);font-weight:800;font-size:21px;fill:var(--bg);letter-spacing:-.02em}
+.mm-n .mm-rs{font-family:var(--f-mono);font-weight:500;font-size:10.5px;fill:var(--bg);opacity:.7;letter-spacing:.08em}
+.mm-br{fill:var(--surface);fill:color-mix(in srgb,var(--bc) 14%,var(--surface));stroke:var(--bc);stroke-width:1.5}
+.mm-n .mm-bl{font-weight:600;font-size:15px}
+.mm-n .mm-cnt{font-family:var(--f-mono);font-weight:500;font-size:12px;fill:var(--muted)}
+.mm-en{fill:var(--surface);stroke:var(--line);stroke-width:1}
+.mm-acc{stroke:var(--bc);stroke-width:3;stroke-linecap:round}
+.mm-n .mm-el{font-weight:500;font-size:13.5px}
+.mm-n .mm-es{font-family:var(--f-mono);font-weight:500;font-size:10px;fill:var(--muted);letter-spacing:.06em}
+.mm-n .mm-es.late{fill:var(--due)}
+.mm-done .mm-el,.mm-lf.done .mm-ll{fill:var(--muted);text-decoration:line-through}
+.mm-pin{fill:var(--accent)}
+.mm-cb{fill:var(--surface);stroke:var(--bc);stroke-width:1.5}
+.mm-lf.done .mm-cb{fill:var(--bc)}
+.mm-ck{fill:none;stroke:var(--surface);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mm-n .mm-ll{font-size:13px}
+.mm-e{fill:none;stroke:var(--bc);stroke-linecap:round}
+.mm-e.e1{stroke-width:3.5}.mm-e.e2{stroke-width:2}.mm-e.e3{stroke-width:1.25;stroke-opacity:.65}
+.mm-fc{fill:var(--surface);stroke:var(--bc);stroke-width:1.5}
+.mm-fold path{stroke:var(--bc);stroke-width:1.8;stroke-linecap:round}
+.mm-n .mm-fold text{font-family:var(--f-mono);font-weight:600;font-size:10px}
+.mm-add .mm-ac{fill:var(--surface);stroke:var(--accent);stroke-width:1.5;stroke-dasharray:3 3}
+.mm-add path,.mm-add2 path{stroke:var(--accent);stroke-width:2;stroke-linecap:round;fill:none}
+.mm-add2 line{stroke:var(--bc);stroke-opacity:.4}
+.mm-empty{font-family:var(--f-body);font-size:14px;fill:var(--muted)}
+#mAddText{font-family:var(--f-text);min-height:96px;font-size:16px;line-height:1.4}
+
+/* ---------- PDF export: one document is both the on-screen preview and the printed pages ---------- */
+.pview{position:fixed;inset:0;z-index:16;background:var(--sunk);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
+.pbar{display:flex;align-items:center;gap:10px;padding-block:8px;background:var(--surface);border-bottom:1px solid var(--line)}
+.pbar h3{font-family:var(--f-display);font-size:19px;margin:0;white-space:nowrap}
+.pbar .ib{margin-left:-10px}
+.phint{font-size:13px;line-height:1.45;color:var(--muted);margin:0;padding-block:9px;background:var(--surface);border-bottom:1px solid var(--line)}
+.pscroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:18px 12px calc(36px + env(safe-area-inset-bottom,0px))}
+.pdoc{
+  --ink:#13161C;--muted:#5D6574;--line:#D7DBE2;--sunk:#F5F6F9;--surface:#FFFFFF;--bg:#ECEFF3;
+  --accent:#2F43E0;--accent-soft:#E3E6FC;--hl:#FFE36B;--hl-ink:#3A2F00;--due:#C23A22;--due-soft:#FBE4DF;--ok:#1E8556;
+  --c1:#D2462B;--c2:#C27700;--c3:#1E8556;--c4:#0B7FA6;--c5:#7A45D1;--c6:#C2338A;
+  color-scheme:light;background:#fff;color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5;
+  max-width:800px;margin:0 auto;padding:46px 52px 40px;border-radius:6px;box-shadow:0 2px 18px rgba(20,24,40,.14);box-sizing:border-box;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;-webkit-user-select:text;user-select:text}
+.pdoc *{box-sizing:border-box}
+.pd-cover{border-bottom:2px solid var(--ink);padding-bottom:1.7em;margin-bottom:1.8em}
+.pd-brand{font-family:var(--f-display);font-weight:800;font-size:1.15em;letter-spacing:-.02em;display:flex;align-items:baseline;gap:2px;margin:0}
+.pd-brand i{width:.42em;height:.42em;border-radius:50%;background:var(--hl);box-shadow:0 0 0 2px var(--ink) inset;display:inline-block}
+.pd-eyebrow{font-family:var(--f-mono);font-size:.72em;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:2.6em 0 .5em}
+.pd-cover h1{font-family:var(--f-display);font-weight:800;font-size:2.6em;line-height:1.04;letter-spacing:-.028em;margin:0}
+.pd-sub{color:var(--muted);margin:.9em 0 0;font-size:.95em}
+.pd-sub b{color:var(--ink);font-weight:600}
+.pd-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:1.8em 0 0}
+.pd-stats div{background:#fff;padding:.75em 1em .8em}
+.pd-stats dt{font-family:var(--f-mono);font-size:.66em;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.pd-stats dd{margin:.15em 0 0;font-family:var(--f-display);font-weight:800;font-size:1.75em;line-height:1.1;font-variant-numeric:tabular-nums}
+.pd-label{font-family:var(--f-mono);font-size:.72em;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 .7em}
+.pd-toc{margin:0 0 1em}
+.pd-toc ol{list-style:none;margin:0;padding:0;counter-reset:toc}
+.pd-toc li{display:flex;align-items:baseline;gap:.7em;padding:.42em 0;break-inside:avoid}
+.pd-toc li::before{counter-increment:toc;content:counter(toc,decimal-leading-zero);font-family:var(--f-mono);font-size:.76em;color:var(--muted);flex:none}
+.pd-toc a{color:inherit;text-decoration:none;font-weight:500;min-width:0;overflow-wrap:anywhere}
+.pd-toc .ld{flex:1;min-width:2em;border-bottom:1px dotted #B9BFCA;transform:translateY(-.3em)}
+.pd-toc .n{font-family:var(--f-mono);font-size:.78em;color:var(--muted);flex:none;font-variant-numeric:tabular-nums}
+.pd-sec{margin-top:2.4em}
+.pd-h{display:flex;align-items:baseline;gap:.5em;font-family:var(--f-display);font-weight:800;font-size:1.55em;line-height:1.2;letter-spacing:-.015em;margin:0 0 .3em;padding-bottom:.4em;border-bottom:2px solid var(--sc,var(--ink));break-after:avoid;page-break-after:avoid}
+.pd-h span{min-width:0;overflow-wrap:anywhere}
+.pd-h i{flex:none;width:.42em;height:.42em;border-radius:50%;background:var(--sc);align-self:center}
+.pd-h small{margin-left:auto;flex:none;font-family:var(--f-mono);font-weight:500;font-size:.46em;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.pd-h3{font-family:var(--f-mono);font-size:.72em;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:1.7em 0 .1em;break-after:avoid;page-break-after:avoid}
+.pd-h3.late{color:var(--due)}
+.pd-note{color:var(--muted);font-size:.88em;margin:.2em 0 1.2em}
+.pe{display:grid;grid-template-columns:8.6em minmax(0,1fr);gap:1.4em;padding:.95em 0;border-top:1px solid var(--line);break-inside:avoid;page-break-inside:avoid}
+.pd-h+.pe,.pd-h3+.pe{border-top:0}
+.pe-meta{display:flex;flex-direction:column;gap:.12em;font-family:var(--f-mono);font-size:.72em;line-height:1.5;color:var(--muted);padding-top:.2em;font-variant-numeric:tabular-nums}
+.pe-meta b{font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--ink)}
+.pe-list .pe-meta b{color:var(--ok)}
+.pe-reminder .pe-meta b{color:var(--accent)}
+.pe-meta em{font-style:normal;color:var(--accent);margin-top:.35em;letter-spacing:.08em;text-transform:uppercase}
+.pe-main{min-width:0}
+.pe-txt{white-space:pre-wrap;overflow-wrap:anywhere}
+.pe a{color:var(--accent);text-decoration:underline;text-underline-offset:2px;overflow-wrap:anywhere;word-break:break-word}
+.pe-title{font-family:var(--f-display);font-size:1.14em;font-weight:600;line-height:1.3;margin:0 0 .45em;overflow-wrap:anywhere}
+.pe-prog{display:flex;align-items:center;gap:.7em;font-family:var(--f-mono);font-size:.72em;color:var(--muted);margin:0 0 .55em}
+.pe-prog span{flex:none;width:7.5em;height:.5em;background:var(--sunk);border:1px solid var(--line);border-radius:1em;overflow:hidden}
+.pe-prog i{display:block;height:100%;background:var(--ok)}
+.pe-chk{list-style:none;margin:0;padding:0}
+.pe-chk.cols{columns:2;column-gap:2.2em}
+.pe-chk li{display:flex;gap:.65em;align-items:baseline;padding:.12em 0;break-inside:avoid}
+.pe-chk i{flex:none;width:.9em;height:.9em;border:1.5px solid var(--muted);border-radius:.22em;transform:translateY(.14em);position:relative}
+.pe-chk .done i{background:var(--ink);border-color:var(--ink)}
+.pe-chk .done i::after{content:"";position:absolute;left:.22em;top:.06em;width:.24em;height:.46em;border:solid #fff;border-width:0 .13em .13em 0;transform:rotate(45deg)}
+.pe-chk .done span{color:var(--muted);text-decoration:line-through}
+.pe-chk span{min-width:0;overflow-wrap:anywhere}
+.pe-due{display:flex;flex-wrap:wrap;gap:.3em .9em;align-items:center;margin-top:.5em;font-family:var(--f-mono);font-size:.78em;color:var(--accent);font-variant-numeric:tabular-nums}
+.pe-due b{font-weight:500;font-size:.88em;letter-spacing:.08em;text-transform:uppercase;border-radius:.4em;padding:.12em .55em;background:var(--accent-soft)}
+.pe-due.late{color:var(--due)}.pe-due.late b{background:var(--due-soft)}
+.pe-due.done{color:var(--muted)}.pe-due.done b{background:var(--sunk);color:var(--ok)}
+.pe.is-done .pe-txt{color:var(--muted);text-decoration:line-through}
+.pe-tags{display:flex;flex-wrap:wrap;gap:.4em;margin-top:.65em}
+.pt{display:inline-flex;align-items:center;gap:.45em;font-size:.78em;font-weight:600;background:var(--hl);color:var(--hl-ink);border-radius:.45em;padding:.14em .6em}
+.pt i{width:.6em;height:.6em;border-radius:50%;flex:none}
+.pd-map svg{display:block;width:100%;height:auto;max-height:205mm;margin:.6em auto 0}
+.pd-tbl{width:100%;border-collapse:collapse;font-size:.92em;margin-top:.4em}
+.pd-tbl th,.pd-tbl td{text-align:left;padding:.55em .6em;border-bottom:1px solid var(--line)}
+.pd-tbl th{font-family:var(--f-mono);font-weight:500;font-size:.72em;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border-bottom-color:var(--ink)}
+.pd-tbl .n{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.pd-tbl td.n{font-size:.92em}
+.pd-tbl tr{break-inside:avoid}
+.pd-tbl .pt{font-size:.92em}
+.pd-empty{text-align:center;color:var(--muted);padding:3em 0}
+.pd-end{display:flex;justify-content:space-between;gap:1em;flex-wrap:wrap;margin-top:3em;padding-top:1em;border-top:1px solid var(--line);font-family:var(--f-mono);font-size:.68em;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+@media screen and (max-width:600px){
+  .pdoc{padding:26px 18px 24px;font-size:13.5px}
+  .pd-cover h1{font-size:2.05em}
+  .pd-stats{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .pd-stats div{grid-column:span 2}.pd-stats div:nth-child(n+4){grid-column:span 3}
+  .pe{grid-template-columns:minmax(0,1fr);gap:.35em}
+  .pe-meta{flex-direction:row;flex-wrap:wrap;gap:.2em .9em}
+  .pe-meta em{margin-top:0}
+  .pe-chk.cols{columns:1}
+}
+@page{margin:16mm 15mm 18mm;
+  @bottom-left{content:"Offload export";font-family:"JetBrains Mono",monospace;font-size:7.5pt;color:#5D6574}
+  @bottom-right{content:"Page " counter(page) " of " counter(pages);font-family:"JetBrains Mono",monospace;font-size:7.5pt;color:#5D6574}}
+@media print{
+  html,body{height:auto!important;overflow:visible!important;background:#fff!important}
+  :root{padding:0!important}
+  body>*:not(.pview){display:none!important}
+  .pview{position:static;display:block;background:#fff;padding:0}
+  .pbar,.phint{display:none!important}
+  .pscroll{overflow:visible;padding:0}
+  .pdoc{max-width:none;padding:0;margin:0;box-shadow:none;border-radius:0;font-size:9.8pt}
+  .pd-map{break-before:page;page-break-before:always}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -216,6 +369,8 @@ textarea#ta:focus{outline:none;border-color:var(--accent)}
       <h1 class="logo">Offload<i aria-hidden="true"></i></h1>
       <span class="sp"></span>
       <button class="ib" id="bSearch" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+      <button class="ib" id="bMap" aria-label="Mind map" title="Mind map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="8.5" y="9.5" width="7" height="5" rx="2.5"/><circle cx="4" cy="5" r="2"/><circle cx="4" cy="19" r="2"/><circle cx="20" cy="5" r="2"/><circle cx="20" cy="19" r="2"/><path d="M8.5 11c-2 0-2.5-4.5-3-4.6M8.5 13c-2 0-2.5 4.5-3 4.6M15.5 11c2 0 2.5-4.5 3-4.6M15.5 13c2 0 2.5 4.5 3 4.6"/></svg></button>
+      <button class="ib" id="bPdf" aria-label="Export as PDF" title="Export as PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 11.5v6M9.5 15l2.5 2.5 2.5-2.5"/></svg></button>
       <button class="ib" id="bSettings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
     </div>
     <div class="chrome"><div class="chrome-in">
@@ -258,6 +413,7 @@ textarea#ta:focus{outline:none;border-color:var(--accent)}
 <div class="sheet gut" id="itemSheet" hidden role="dialog" aria-label="Item options">
   <div class="grab"></div>
   <div class="prev" id="sPrev"></div>
+  <button class="act" data-a="show" hidden>Show in feed</button>
   <button class="act" data-a="pin">Pin</button>
   <button class="act" data-a="edit">Edit</button>
   <button class="act" data-a="cal">Add to Calendar</button>
@@ -286,6 +442,9 @@ textarea#ta:focus{outline:none;border-color:var(--accent)}
   <h4>Install</h4>
   <div class="btns"><button class="btn primary" id="bInstall" hidden>Install Offload</button></div>
   <p class="note">On iPhone: tap Share, then Add to Home Screen. On Android or desktop Chrome: use Install app in the browser menu.</p>
+  <h4>Export</h4>
+  <div class="btns"><button class="btn" id="bPdf2">Export as PDF</button><button class="btn" id="bMap2">Open mind map</button></div>
+  <p class="note">The PDF puts every note, list and reminder in a clean, printable layout, with a contents page, a mind map and a tag index.</p>
   <h4>Backup</h4>
   <textarea id="io" placeholder="Paste a backup here to import it" aria-label="Backup data"></textarea>
   <div class="btns"><button class="btn" id="bExport">Copy backup</button><button class="btn" id="bImport">Import</button></div>
@@ -304,6 +463,55 @@ textarea#ta:focus{outline:none;border-color:var(--accent)}
     <p class="note" id="tnote"></p>
     <div class="btns"><button class="btn primary" type="submit" id="tsave">Create tag</button><button class="btn danger" type="button" id="tdel" hidden>Delete tag</button></div>
   </form>
+</div>
+
+<div class="sheet gut" id="pdfSheet" hidden role="dialog" aria-labelledby="pdfTitle">
+  <div class="grab"></div>
+  <h3 id="pdfTitle">Export as PDF</h3>
+  <div id="scopeWrap">
+    <h4>Include</h4>
+    <div class="seg" id="segScope"><button data-v="all">Everything</button><button data-v="view">Current view</button></div>
+    <p class="note" id="scopeNote"></p>
+  </div>
+  <h4>Organize by</h4>
+  <div class="seg" id="segGroup"><button data-v="type">Type</button><button data-v="tag">Tag</button><button data-v="date">Date</button></div>
+  <h4>Options</h4>
+  <label class="toggle" for="pMap"><input type="checkbox" id="pMap"><span>Mind map page<small>A one-page map of your tags and entries.</small></span></label>
+  <label class="toggle" for="pDone"><input type="checkbox" id="pDone"><span>Completed reminders<small>Turn off to export only what's still open.</small></span></label>
+  <p class="note" id="pCount"></p>
+  <div class="btns" style="margin-top:18px"><button class="btn primary" id="pGo">Preview PDF</button></div>
+</div>
+
+<div class="sheet gut" id="mAddSheet" hidden role="dialog" aria-labelledby="mAddTitle">
+  <div class="grab"></div>
+  <h3 id="mAddTitle">New note</h3>
+  <form class="cform" id="mAddForm">
+    <textarea id="mAddText" rows="3" placeholder="Type an idea" aria-label="Note text"></textarea>
+    <div class="btns"><button class="btn primary" type="submit">Add to map</button><button class="btn" type="button" id="mAddDone">Done</button></div>
+  </form>
+</div>
+
+<div class="mview" id="mapView" hidden role="dialog" aria-label="Mind map">
+  <div class="mbar gut">
+    <button class="ib" id="mBack" aria-label="Close mind map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <h3>Mind map</h3>
+    <span class="sp"></span>
+    <div class="seg sm" id="segMap" role="group" aria-label="Branch by"><button data-v="tag">Tags</button><button data-v="type">Types</button></div>
+  </div>
+  <div class="mcanvas" id="mcanvas"><svg id="msvg" xmlns="http://www.w3.org/2000/svg" aria-label="Mind map of your entries"></svg></div>
+  <p class="mhelp" id="mhelp">Drag to move, pinch to zoom. Tap a branch to fold it, + to add.</p>
+  <div class="mzoom"><button id="mOut" aria-label="Zoom out">−</button><button id="mFit">Fit</button><button id="mIn" aria-label="Zoom in">+</button></div>
+</div>
+
+<div class="pview" id="pdfView" hidden role="dialog" aria-label="PDF preview">
+  <div class="pbar gut">
+    <button class="ib" id="pBack" aria-label="Close preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <h3>PDF preview</h3>
+    <span class="sp"></span>
+    <button class="btn primary" id="pPrint">Save as PDF</button>
+  </div>
+  <p class="phint gut" id="pHint"></p>
+  <div class="pscroll"><div class="pdoc" id="pdoc"></div></div>
 </div>
 
 <div class="toast" id="toast" hidden></div>
@@ -460,6 +668,7 @@ function render(scroll){
   }
   feed.innerHTML=h;
   if(scroll!==false)requestAnimationFrame(()=>feed.scrollTop=ui.filter==='reminder'?0:feed.scrollHeight);
+  if(MM.open)drawMap();
 }
 
 /* ---------- composer ---------- */
@@ -591,7 +800,7 @@ function closeSheets(){$('#scrim').hidden=true;$$('.sheet').forEach(s=>s.hidden=
 function openItem(id){const it=find(id);if(!it)return;ui.itemId=id;
   $('#sPrev').textContent=fullText(it).slice(0,240);
   $('#itemSheet [data-a="pin"]').textContent=it.pinned?'Unpin':'Pin';
-  $('#itemSheet [data-a="cal"]').hidden=it.type!=='reminder';openSheet('#itemSheet')}
+  $('#itemSheet [data-a="cal"]').hidden=it.type!=='reminder';$('#itemSheet [data-a="show"]').hidden=!MM.open;openSheet('#itemSheet')}
 
 
 /* ---------- reminders ---------- */
@@ -652,11 +861,12 @@ $('#feed').addEventListener('change',e=>{const cb=e.target.closest('.chk input')
   const it=find(cb.closest('.card').dataset.id);it.items[+cb.dataset.i].done=cb.checked;delete it.ex;save();render(false)});
 
 $('#scrim').addEventListener('click',closeSheets);
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ui.sheet)closeSheets()});
+document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(ui.sheet)closeSheets();else if(!$('#pdfView').hidden)closePdf();else if(MM.open)closeMap()});
 $('#itemSheet').addEventListener('click',async e=>{const b=e.target.closest('.act');if(!b)return;const it=find(ui.itemId);if(!it)return closeSheets();
   const a=b.dataset.a;
   if(a==='pin'){it.pinned=!it.pinned;save();closeSheets();render(false);toast(it.pinned?'Pinned':'Unpinned')}
-  if(a==='edit'){closeSheets();startEdit(it)}
+  if(a==='show'){closeSheets();closeMap();ui.filter='all';ui.tag=null;ui.pinned=false;ui.q='';$('#q').value='';setMode(ui.mode);render(false);flash(it.id);return}
+  if(a==='edit'){closeSheets();closeMap();startEdit(it)}
   if(a==='cal'){closeSheets();addToCalendar(it);return}
   if(a==='copy'){try{await navigator.clipboard.writeText(fullText(it));toast('Copied')}catch(err){toast('Copy is blocked here. Long-press the text to copy it.')}closeSheets()}
   if(a==='del'){if(!ui.delArm){ui.delArm=true;b.textContent='Tap again to delete';return}
@@ -709,11 +919,286 @@ $('#tform').addEventListener('submit',e=>{e.preventDefault();
     save();closeSheets();render(false);toast('Tag saved');return}
   if(!(S.tags||[]).includes(name))S.tags=(S.tags||[]).concat(name);
   setTagColor(name);
-  ui.tag=name;ui.pinned=false;save();closeSheets();setMode(ui.mode);render(false);const tr=$('#tagrail'),sel=tr.querySelector('.tg[aria-pressed="true"]');if(sel)tr.scrollLeft=Math.max(0,sel.offsetLeft-tr.clientWidth/2+sel.offsetWidth/2);ta.focus();toast('#'+name+' is ready. New entries will use it.')});
+  ui.tag=name;ui.pinned=false;save();closeSheets();setMode(ui.mode);render(false);const tr=$('#tagrail'),sel=tr.querySelector('.tg[aria-pressed="true"]');if(sel)tr.scrollLeft=Math.max(0,sel.offsetLeft-tr.clientWidth/2+sel.offsetWidth/2);
+  if(MM.open){S.settings.mapBy='tag';drawMap();toast('#'+name+' added. Tap + on it to add notes.')}else{ta.focus();toast('#'+name+' is ready. New entries will use it.')}});
 $('#tdel').addEventListener('click',e=>{const b=e.currentTarget,t=ui.tagEdit;if(!t)return;
   if(!ui.delArm){ui.delArm=true;b.textContent='Tap again to delete';return}
   S.items.forEach(it=>mapTagText(it,x=>{const y=x.replace(reTag(t),'$1').replace(/[ \t]{2,}/g,' ').trim();return y||(x===it.text?t:'')}));
   S.tags=(S.tags||[]).filter(x=>x!==t);if(S.tagColors)delete S.tagColors[t];if(ui.tag===t)ui.tag=null;save();closeSheets();setMode(ui.mode);render(false);toast('Deleted #'+t)});
+
+/* ---------- overlays (mind map, PDF preview): the phone's Back gesture closes them ---------- */
+function ovPush(){try{history.pushState({ov:1},'')}catch(e){}}
+let popSelf=false;
+function ovPop(){try{if(history.state&&history.state.ov){popSelf=true;history.back()}}catch(e){}}
+addEventListener('popstate',()=>{if(popSelf){popSelf=false;return}if(ui.sheet)closeSheets();if(!$('#pdfView').hidden)closePdf(true);else if(MM.open)closeMap(true)});
+
+/* ---------- mind map ----------
+   Root → branches (tags, or types) → entries → list items, laid out left and right of the root like a classic mind map.
+   Built as SVG markup from S.items on every render, so it always matches the feed. */
+const MM={open:false,k:1,tx:0,ty:0,fold:new Set(),unfold:new Set(),byKey:new Map(),bounds:null,addTo:null};
+const SG={branch:22,entry:10,leaf:2}, HG={branch:72,entry:46,leaf:30};
+let mctx=null;
+function tw(s,font){mctx=mctx||document.createElement('canvas').getContext('2d');mctx.font=font;return mctx.measureText(s).width}
+const clip=(s,n)=>{s=String(s||'').replace(/\s+/g,' ').trim();return s.length>n?s.slice(0,n-1).trimEnd()+'…':s};
+const noTags=s=>String(s||'').split('\n').map(l=>l.replace(/(^|\s)#[\p{L}\p{N}_-]+/gu,'$1').replace(/[ \t]{2,}/g,' ').trim()).join('\n').replace(/\n{3,}/g,'\n\n').trim();
+const fD=t=>new Date(t).toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'});
+const fDL=t=>new Date(t).toLocaleDateString([], {weekday:'long',month:'long',day:'numeric',year:'numeric'});
+const plural=(n,w)=>n+' '+(n===1?w:(w.endsWith('y')?w.slice(0,-1)+'ies':w+'s'));
+function mmFonts(){const cs=getComputedStyle(root);return{d:cs.getPropertyValue('--f-display').trim()||'sans-serif',b:cs.getPropertyValue('--f-body').trim()||'sans-serif',m:cs.getPropertyValue('--f-mono').trim()||'monospace'}}
+function entryLabel(it){
+  const first=noTags(it.text).replace(/https?:\/\/(www\.)?/g,'').split('\n')[0];
+  if(it.type==='list')return clip(first||'Untitled list',34);
+  return clip(first||(it.type==='reminder'?'Reminder':'Note'),34)}
+function entrySub(it){
+  if(it.type==='list'){const d=it.items.filter(x=>x.done).length;return`List · ${d}/${it.items.length} done`}
+  if(it.type==='reminder')return(it.done?'Done · ':(it.due<Date.now()?'Overdue · ':'Reminder · '))+dueLabel(it.due);
+  return'Note · '+fD(it.created)}
+function mmTree(items,by,o){
+  items=items.slice().sort((a,b)=>(!!b.pinned-!!a.pinned)||a.created-b.created);
+  const rootN={key:'root',kind:'root',label:'Offload',sub:plural(items.length,'entry'),children:[]};
+  const entry=(it,pk,color)=>{const key=pk+'/'+it.id;
+    const n={key,kind:'entry',it,color,label:entryLabel(it),sub:entrySub(it),children:[]};
+    if(it.type==='list'&&!o.print)n.children=it.items.map((x,i)=>({key:key+'/'+i,kind:'leaf',it,i,color,done:x.done,label:clip(noTags(x.t)||x.t,40),children:[]}));
+    return n};
+  const branch=(key,label,color,its,extra)=>{const b=Object.assign({key,kind:'branch',label,color,count:its.length,children:[]},extra);
+    b.children=o.entries===false?[]:its.map(i=>entry(i,key,color));rootN.children.push(b)};
+  if(by==='type'){
+    [['note','Notes','c4'],['list','Lists','c3'],['reminder','Reminders','c5']].forEach(([t,l,c])=>{const its=items.filter(i=>i.type===t);if(its.length||(t==='note'&&!o.print))branch('y:'+t,l,c,its,{type:t})});
+  }else{
+    const counts={};items.forEach(i=>tagsOf(fullText(i)).forEach(t=>counts[t]=(counts[t]||0)+1));
+    const order=o.print?Object.keys(counts).sort((a,b)=>counts[b]-counts[a]||a.localeCompare(b)):sortedTags().map(x=>x[0]);
+    order.forEach((t,ix)=>branch('g:'+t,'#'+t,tcOf(t)||TCOLORS[ix%TCOLORS.length],items.filter(i=>tagsOf(fullText(i)).includes(t)),{tag:t}));
+    const un=items.filter(i=>!tagsOf(fullText(i)).length);
+    if(un.length)branch('g:','Untagged',null,un,{tag:''});
+  }
+  return rootN}
+function mmFolded(n,o){if(o.print||!n.children.length)return false;if(MM.fold.has(n.key))return true;if(MM.unfold.has(n.key))return false;
+  return n.kind==='entry'?n.children.length>6:n.kind==='branch'?n.children.length>24:false}
+function mmSize(n,F){
+  if(n.kind==='root'){n.h=60;n.w=Math.ceil(Math.max(150,tw(n.label,`800 21px ${F.d}`)+52,tw(n.sub.toUpperCase(),`500 10.5px ${F.m}`)+n.sub.length*.85+44))}
+  else if(n.kind==='branch'){n.lw=tw(n.label,`600 15px ${F.b}`);n.cw=tw(String(n.count),`500 12px ${F.m}`);n.h=40;n.w=Math.ceil(16+n.lw+9+n.cw+16+(n.add?34:0))}
+  else if(n.kind==='entry'){n.h=46;n.w=Math.ceil(Math.min(290,Math.max(118,tw(n.label,`500 13.5px ${F.b}`),tw(n.sub.toUpperCase(),`500 10px ${F.m}`)+n.sub.length*.6))+32)}
+  else{n.h=28;n.w=Math.ceil(tw(n.label,`400 13px ${F.b}`)+28)}
+  n.children.forEach(c=>mmSize(c,F))}
+function mmSpan(n,o){n.kids=mmFolded(n,o)?[]:n.children;
+  if(!n.kids.length)return n.span=n.h;
+  let s=0;n.kids.forEach((c,i)=>{s+=mmSpan(c,o)+(i?SG[c.kind]:0)});return n.span=Math.max(n.h,s)}
+function mmPlace(n,x,top,dir,o){
+  n.dir=dir;n.cy=top+n.span/2;if(dir>0){n.l=x;n.r=x+n.w}else{n.r=x;n.l=x-n.w}
+  if(!n.kids.length)return;
+  const tot=n.kids.reduce((s,c,i)=>s+c.span+(i?SG[c.kind]:0),0),gap=HG[n.kids[0].kind]+(o.print?0:8);
+  let y=top+(n.span-tot)/2;const cx=dir>0?n.r+gap:n.l-gap;
+  n.kids.forEach((c,i)=>{if(i)y+=SG[c.kind];mmPlace(c,cx,y,dir,o);y+=c.span})}
+function mmBuild(items,by,o){
+  o=o||{};const F=mmFonts(),R=mmTree(items,by,o);
+  if(!o.print){R.add=by==='tag';R.children.forEach(b=>{b.add=by==='tag'||b.type==='note'})}
+  mmSize(R,F);R.kids=R.children;R.children.forEach(b=>mmSpan(b,o));
+  const total=R.kids.reduce((s,b)=>s+b.span,0),Rt=[],Lt=[];let acc=0;
+  R.kids.forEach(b=>{((acc+b.span/2<=total/2)||!Rt.length?Rt:Lt).push(b);acc+=b.span});
+  R.l=-R.w/2;R.r=R.w/2;R.cy=0;
+  [[Rt,1],[Lt,-1]].forEach(([arr,dir])=>{const tot=arr.reduce((s,c,i)=>s+c.span+(i?SG.branch:0),0);let y=-tot/2;
+    arr.forEach((c,i)=>{if(i)y+=SG.branch;mmPlace(c,dir*(R.w/2+HG.branch),y,dir,o);y+=c.span})});
+  const all=[],edges=[],byKey=new Map();
+  (function walk(n){all.push(n);byKey.set(n.key,n);(n.kids||[]).forEach(walk)})(R);
+  let x0=R.l,x1=R.r,y0=-R.h/2,y1=R.h/2+(R.add?48:0);
+  all.forEach(n=>{x0=Math.min(x0,n.l-(n.kind!=='root'&&n.children.length&&!o.print&&n.dir<0?26:0));x1=Math.max(x1,n.r+(n.kind!=='root'&&n.children.length&&!o.print&&n.dir>0?26:0));y0=Math.min(y0,n.cy-n.h/2);y1=Math.max(y1,n.cy+n.h/2)});
+  all.forEach(p=>(p.kids||[]).forEach(c=>{
+    const out=p.kind==='root'?(c.dir>0?p.r-14:p.l+14):(c.dir>0?p.r:p.l)+(o.print?0:c.dir*17);
+    const x2=c.dir>0?c.l:c.r,y2=c.cy,y1e=p.cy,mx=(out+x2)/2,cls=c.kind==='branch'?'e1':c.kind==='entry'?'e2':'e3';
+    edges.push(`<path class="mm-e ${cls}" style="--bc:${c.color?`var(--${c.color})`:'var(--muted)'}" d="M${out.toFixed(1)},${y1e.toFixed(1)} C${mx.toFixed(1)},${y1e.toFixed(1)} ${mx.toFixed(1)},${y2.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}"/>`)}));
+  const nodes=all.map(n=>mmNode(n,o)).join('');
+  let extra='';
+  if(!items.length&&!o.print)extra=`<text class="mm-empty" x="0" y="${R.h/2+(R.add?80:34)}" text-anchor="middle">Your entries will branch out from here.</text>`;
+  return{html:edges.join('')+nodes+extra,bounds:{x:x0,y:y0,w:x1-x0,h:y1-y0+(extra?60:0)},byKey}}
+function mmNode(n,o){
+  const col=n.color?`var(--${n.color})`:'var(--muted)',x=n.l,y=n.cy-n.h/2;let s='';
+  if(n.kind==='root'){
+    s=`<rect class="mm-rootbox" width="${n.w}" height="${n.h}" rx="${n.h/2}"/><text class="mm-rt" x="${n.w/2}" y="29" text-anchor="middle">${esc(n.label)}</text><text class="mm-rs" x="${n.w/2}" y="45" text-anchor="middle">${esc(n.sub.toUpperCase())}</text>`;
+    if(n.add)s+=`<g class="mm-add" data-a="add" transform="translate(${n.w/2},${n.h+24})"><circle class="mm-hit" r="22"/><circle class="mm-ac" r="13"/><path d="M-5 0h10M0-5v10"/></g>`;
+  }else if(n.kind==='branch'){
+    s=`<rect class="mm-br" x=".75" y=".75" width="${n.w-1.5}" height="${n.h-1.5}" rx="12"/><text class="mm-bl" x="16" y="25.5">${esc(n.label)}</text><text class="mm-cnt" x="${(16+n.lw+9).toFixed(1)}" y="25">${n.count}</text>`;
+    if(n.add)s+=`<g class="mm-add2" data-a="add"><rect class="mm-hit" x="${n.w-36}" width="36" height="${n.h}"/><line x1="${n.w-34}" y1="9" x2="${n.w-34}" y2="${n.h-9}"/><path d="M${n.w-22} ${n.h/2}h10M${n.w-17} ${n.h/2-5}v10"/></g>`;
+  }else if(n.kind==='entry'){
+    const ax=n.dir>0?6:n.w-6,late=n.it.type==='reminder'&&!n.it.done&&n.it.due<Date.now();
+    s=`<rect class="mm-en" x=".5" y=".5" width="${n.w-1}" height="${n.h-1}" rx="10"/><line class="mm-acc" x1="${ax}" y1="11" x2="${ax}" y2="${n.h-11}"/><text class="mm-el" x="16" y="20">${esc(n.label)}</text><text class="mm-es${late?' late':''}" x="16" y="35">${esc(n.sub.toUpperCase())}</text>${n.it.pinned?`<circle class="mm-pin" cx="${n.dir>0?n.w-9:9}" cy="9" r="3"/>`:''}`;
+  }else{
+    s=`<rect class="mm-hit" width="${n.w}" height="${n.h}"/><circle class="mm-cb" cx="9" cy="${n.h/2}" r="6.5"/>${n.done?`<path class="mm-ck" d="M6 ${n.h/2}l2.2 2.2L12.2 ${n.h/2-2.6}"/>`:''}<text class="mm-ll" x="22" y="${n.h/2+4.5}">${esc(n.label)}</text>`;
+  }
+  if(n.kind!=='root'&&n.children.length&&!o.print){const f=mmFolded(n,o),bx=n.dir>0?n.w+(f?13:10):-(f?13:10);
+    s+=`<g class="mm-fold" data-a="fold" transform="translate(${bx},${n.h/2})"><circle class="mm-hit" r="20"/><circle class="mm-fc" r="${f?11:7}"/>${f?`<text y="3.5" text-anchor="middle">${n.children.length>99?'99+':n.children.length}</text>`:'<path d="M-3.5 0h7"/>'}</g>`}
+  const cls=n.kind==='leaf'?`mm-lf${n.done?' done':''}`:n.kind==='entry'&&n.it.done?'mm-done':'';
+  return`<g class="mm-n ${cls}" data-k="${esc(n.key)}" style="--bc:${col}" transform="translate(${x.toFixed(1)},${y.toFixed(1)})">${s}</g>`}
+
+const mc=$('#mcanvas'),msvg=$('#msvg');
+function mmApply(){const g=$('#mvp');if(g)g.setAttribute('transform',`translate(${MM.tx.toFixed(1)},${MM.ty.toFixed(1)}) scale(${MM.k.toFixed(4)})`);
+  mc.style.backgroundPosition=`${MM.tx}px ${MM.ty}px`;mc.style.backgroundSize=`${24*MM.k}px ${24*MM.k}px`}
+function drawMap(){
+  const by=S.settings.mapBy==='type'?'type':'tag',r=mmBuild(S.items,by);
+  MM.byKey=r.byKey;MM.bounds=r.bounds;msvg.innerHTML=`<g id="mvp">${r.html}</g>`;mmApply();
+  $$('#segMap button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===by))}
+function mmZoom(f,cx,cy){const k=Math.min(3,Math.max(.1,MM.k*f));f=k/MM.k;MM.tx=cx-(cx-MM.tx)*f;MM.ty=cy-(cy-MM.ty)*f;MM.k=k;mmApply()}
+function mmFit(all){const b=MM.bounds,W=mc.clientWidth,H=mc.clientHeight,pad=28;if(!b||!W)return;
+  const fit=Math.min(1.15,(W-2*pad)/b.w,(H-2*pad-60)/b.h),floor=all===true?.1:W<700?.62:.3;
+  if(fit>=floor){MM.k=fit;MM.tx=W/2-(b.x+b.w/2)*MM.k;MM.ty=(H-60)/2-(b.y+b.h/2)*MM.k}
+  else{MM.k=floor;MM.tx=W/2;MM.ty=(H-60)/2} // too big to read when fitted: stay readable, centered on the root
+  mmApply()}
+function openMap(){closeSheets();MM.open=true;$('#mapView').hidden=false;
+  $$('#segMap button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===(S.settings.mapBy==='type'?'type':'tag')));
+  if(document.activeElement===ta)ta.blur();drawMap();mmFit();ovPush()}
+function closeMap(fromPop){if(!MM.open)return;MM.open=false;$('#mapView').hidden=true;msvg.innerHTML='';if(!fromPop)ovPop()}
+function mmTap(t){
+  const g=t&&t.closest&&t.closest('[data-k]');if(!g)return;const n=MM.byKey.get(g.dataset.k);if(!n)return;
+  const a=t.closest('[data-a]'),act=a&&a.dataset.a;
+  if(act==='add'){if(n.kind==='root')openTag(null);else openMAdd(n);return}
+  if(n.kind==='leaf'){const x=n.it.items[n.i];if(!x)return;x.done=!x.done;delete n.it.ex;save();render(false);return}
+  if(n.kind==='entry'&&act!=='fold'){openItem(n.it.id);return}
+  if(!n.children.length)return;
+  const ox=n.dir>0?n.l:n.r,oy=n.cy;
+  if(mmFolded(n,{})){MM.fold.delete(n.key);MM.unfold.add(n.key)}else{MM.unfold.delete(n.key);MM.fold.add(n.key)}
+  drawMap();const m=MM.byKey.get(n.key);
+  if(m){MM.tx-=((m.dir>0?m.l:m.r)-ox)*MM.k;MM.ty-=(m.cy-oy)*MM.k;mmApply()}}
+function openMAdd(n){MM.addTo=n;const where=n.tag?'#'+n.tag:n.tag===''?'Untagged':'Notes';
+  $('#mAddTitle').textContent='New note in '+where;$('#mAddText').value='';openSheet('#mAddSheet');$('#mAddText').focus()}
+$('#mAddForm').addEventListener('submit',e=>{e.preventDefault();const raw=$('#mAddText').value.trim();if(!raw){$('#mAddText').focus();return}
+  const n=MM.addTo||{},t=n.tag;
+  const text=t&&!tagsOf(raw).includes(t)?raw+' #'+t:raw;
+  S.items.push({id:uid(),type:'note',text,created:Date.now()});
+  if(n.key){MM.fold.delete(n.key);MM.unfold.add(n.key)}
+  save();render(false);$('#mAddText').value='';$('#mAddText').focus();toast(t?'Added to #'+t:'Note added')});
+$('#mAddText').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();$('#mAddForm').requestSubmit()}});
+$('#mAddDone').addEventListener('click',closeSheets);
+
+// pan with one finger or the mouse, pinch or ctrl/⌘-scroll to zoom, tap to act
+const MP=new Map();let mdrag=null,mpinch=null;
+const rel=e=>{const r=mc.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
+mc.addEventListener('pointerdown',e=>{if(e.button>0)return;try{mc.setPointerCapture(e.pointerId)}catch(err){}
+  MP.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(MP.size===1)mdrag={x:e.clientX,y:e.clientY,tx:MM.tx,ty:MM.ty,moved:false,target:e.target};
+  else{if(mdrag)mdrag.moved=true;mpinch=null}});
+mc.addEventListener('pointermove',e=>{if(!MP.has(e.pointerId))return;MP.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(MP.size>=2){const[a,b]=[...MP.values()],t={d:Math.hypot(a.x-b.x,a.y-b.y),x:(a.x+b.x)/2,y:(a.y+b.y)/2},r=mc.getBoundingClientRect();
+    if(mpinch&&mpinch.d>0){MM.tx+=t.x-mpinch.x;MM.ty+=t.y-mpinch.y;mmZoom(t.d/mpinch.d,t.x-r.left,t.y-r.top)}mpinch=t;return}
+  if(!mdrag)return;const dx=e.clientX-mdrag.x,dy=e.clientY-mdrag.y;
+  if(!mdrag.moved&&Math.hypot(dx,dy)>6){mdrag.moved=true;mc.classList.add('drag')}
+  if(mdrag.moved){MM.tx=mdrag.tx+dx;MM.ty=mdrag.ty+dy;mmApply()}});
+function mEnd(e){if(!MP.has(e.pointerId))return;MP.delete(e.pointerId);mpinch=null;
+  if(MP.size===1){const[p]=MP.values();mdrag={x:p.x,y:p.y,tx:MM.tx,ty:MM.ty,moved:true,target:null};return}
+  if(!MP.size){mc.classList.remove('drag');const d=mdrag;mdrag=null;if(d&&!d.moved&&e.type==='pointerup')mmTap(d.target)}}
+mc.addEventListener('pointerup',mEnd);mc.addEventListener('pointercancel',mEnd);
+mc.addEventListener('wheel',e=>{e.preventDefault();
+  if(e.ctrlKey||e.metaKey){const[x,y]=rel(e);mmZoom(Math.exp(-e.deltaY*(e.deltaMode?0.05:0.0045)),x,y)}
+  else{const f=e.deltaMode?16:1;MM.tx-=e.deltaX*f;MM.ty-=e.deltaY*f;mmApply()}},{passive:false});
+const mmCenter=f=>mmZoom(f,mc.clientWidth/2,mc.clientHeight/2);
+$('#mIn').addEventListener('click',()=>mmCenter(1.25));
+$('#mOut').addEventListener('click',()=>mmCenter(.8));
+$('#mFit').addEventListener('click',()=>mmFit(true));
+$('#mBack').addEventListener('click',()=>closeMap());
+$('#segMap').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.settings.mapBy=b.dataset.v;save();
+  $$('#segMap button').forEach(x=>x.setAttribute('aria-pressed',x===b));drawMap();mmFit()});
+$('#bMap').addEventListener('click',openMap);
+$('#bMap2').addEventListener('click',openMap);
+document.addEventListener('keydown',e=>{if(!MM.open||ui.sheet||/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)||e.ctrlKey||e.metaKey)return;
+  if(e.key==='+'||e.key==='=')mmCenter(1.25);else if(e.key==='-')mmCenter(.8);else if(e.key==='0')mmFit(true);
+  else if(/^Arrow/.test(e.key)){const s=60;MM.tx+=e.key==='ArrowLeft'?s:e.key==='ArrowRight'?-s:0;MM.ty+=e.key==='ArrowUp'?s:e.key==='ArrowDown'?-s:0;mmApply()}else return;
+  e.preventDefault()});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(MM.open)drawMap()});
+
+/* ---------- PDF export ----------
+   Builds a print-ready document (cover, contents, mind map, sections, tag index) and shows it as a preview.
+   "Save as PDF" opens the system print dialog, which saves real, selectable, vector PDF on every platform. */
+const pdfOpts=()=>S.settings.pdf=Object.assign({scope:'all',group:'type',done:true,map:true},S.settings.pdf||{});
+const filtered=()=>ui.filter!=='all'||!!ui.tag||!!ui.q.trim()||ui.pinned;
+function viewDesc(){const p=[];if(ui.pinned)p.push('Pinned');if(ui.filter!=='all')p.push({note:'Notes',list:'Lists',reminder:'Reminders'}[ui.filter]);if(ui.tag)p.push('#'+ui.tag);if(ui.q.trim())p.push('“'+ui.q.trim()+'”');return p.join(' · ')}
+function pdfItems(o){let l=(o.scope==='view'&&filtered())?visible():S.items.slice();if(!o.done)l=l.filter(i=>!(i.type==='reminder'&&i.done));return l}
+function syncPdfSheet(){const o=pdfOpts(),f=filtered();
+  $('#scopeWrap').hidden=!f;$('#scopeNote').textContent=f?'Current view: '+viewDesc():'';
+  $$('#segScope button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===o.scope));
+  $$('#segGroup button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===o.group));
+  $('#pMap').checked=!!o.map;$('#pDone').checked=!!o.done;
+  const n=pdfItems(o).length;$('#pCount').textContent=n?`${plural(n,'entry')} will be exported.`:'Nothing to export with these settings.';$('#pGo').disabled=!n}
+function openExport(){if(document.activeElement===ta)ta.blur();syncPdfSheet();openSheet('#pdfSheet')}
+$('#bPdf').addEventListener('click',openExport);
+$('#bPdf2').addEventListener('click',openExport);
+$('#segScope').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;pdfOpts().scope=b.dataset.v;save();syncPdfSheet()});
+$('#segGroup').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;pdfOpts().group=b.dataset.v;save();syncPdfSheet()});
+$('#pMap').addEventListener('change',e=>{pdfOpts().map=e.target.checked;save()});
+$('#pDone').addEventListener('change',e=>{pdfOpts().done=e.target.checked;save();syncPdfSheet()});
+
+function pdLink(s){return esc(s).replace(/https?:\/\/[^\s<]+/g,u=>{let tail='';const m=u.match(/[.,;:!?)]+$/);if(m){tail=m[0];u=u.slice(0,-tail.length)}return`<a href="${u}">${u}</a>${tail}`})}
+function pdTags(ts){return ts.length?`<div class="pe-tags">${ts.map(t=>{const c=tcOf(t);return`<span class="pt">${c?`<i style="background:var(--${c})"></i>`:''}#${esc(t)}</span>`}).join('')}</div>`:''}
+function pdEntry(it){
+  const now=Date.now(),kind={note:'Note',list:'List',reminder:'Reminder'}[it.type]||'Entry';let body='';
+  if(it.type==='list'){const n=it.items.length,d=it.items.filter(x=>x.done).length;
+    body=`<h4 class="pe-title">${pdLink(noTags(it.text))||'Untitled list'}</h4>
+      <div class="pe-prog"><span><i style="width:${n?Math.round(d/n*100):0}%"></i></span>${d} of ${n} done</div>
+      <ul class="pe-chk${n>10?' cols':''}">${it.items.map(x=>`<li class="${x.done?'done':''}"><i></i><span>${pdLink(noTags(x.t))||'&nbsp;'}</span></li>`).join('')}</ul>`;
+  }else{const t=noTags(it.text);body=t?`<div class="pe-txt">${pdLink(t)}</div>`:'';
+    if(it.type==='reminder'){const late=!it.done&&it.due<now;
+      body+=`<div class="pe-due${late?' late':''}${it.done?' done':''}">${it.done?'<b>Done</b>':late?'<b>Overdue</b>':''}<span>${new Date(it.due).toLocaleDateString([], {weekday:'short',month:'short',day:'numeric',year:'numeric'})} · ${fT(it.due)}</span>${it.repeat&&it.repeat.length?`<span>↻ ${repLabel(it.repeat)}</span>`:''}</div>`}}
+  return`<article class="pe pe-${it.type}${it.done?' is-done':''}"><div class="pe-meta"><b>${kind}</b><span>${fD(it.created)}</span><span>${fT(it.created)}</span>${it.pinned?'<em>● Pinned</em>':''}</div><div class="pe-main">${body}${pdTags(tagsOf(fullText(it)))}</div></article>`}
+function pdSections(items,o){
+  const out=[],byPin=(a,b)=>(!!b.pinned-!!a.pinned)||b.created-a.created,now=Date.now();
+  if(o.group==='tag'){
+    const counts={};items.forEach(i=>tagsOf(fullText(i)).forEach(t=>counts[t]=(counts[t]||0)+1));
+    Object.keys(counts).sort((a,b)=>counts[b]-counts[a]||a.localeCompare(b)).forEach(t=>out.push({id:'pd-t-'+tagSlug(t),title:'#'+t,color:tcOf(t),items:items.filter(i=>tagsOf(fullText(i)).includes(t)).sort(byPin)}));
+    const un=items.filter(i=>!tagsOf(fullText(i)).length).sort(byPin);if(un.length)out.push({id:'pd-t--',title:'Untagged',items:un});
+  }else if(o.group==='date'){
+    const m=new Map();items.slice().sort((a,b)=>b.created-a.created).forEach(i=>{const k=startOf(i.created);if(!m.has(k))m.set(k,[]);m.get(k).push(i)});
+    m.forEach((l,k)=>out.push({id:'pd-d-'+k,title:fDL(k),items:l.sort((a,b)=>a.created-b.created)}));
+  }else{
+    [['note','Notes'],['list','Lists']].forEach(([t,l])=>{const x=items.filter(i=>i.type===t).sort(byPin);if(x.length)out.push({id:'pd-'+t,title:l,items:x})});
+    const rem=items.filter(i=>i.type==='reminder');
+    if(rem.length)out.push({id:'pd-reminder',title:'Reminders',items:rem,subs:[
+      ['Overdue',rem.filter(i=>!i.done&&i.due<now).sort((a,b)=>a.due-b.due),'late'],
+      ['Upcoming',rem.filter(i=>!i.done&&i.due>=now).sort((a,b)=>a.due-b.due),''],
+      ['Completed',rem.filter(i=>i.done).sort((a,b)=>b.due-a.due),'']].filter(x=>x[1].length)});
+  }
+  return out}
+function buildPdf(){
+  const o=pdfOpts(),items=pdfItems(o),now=Date.now(),c={note:0,list:0,reminder:0};items.forEach(i=>c[i.type]++);
+  const tagN={};items.forEach(i=>tagsOf(fullText(i)).forEach(t=>{tagN[t]=tagN[t]||{note:0,list:0,reminder:0,all:0};tagN[t][i.type]++;tagN[t].all++}));
+  const tags=Object.keys(tagN).sort((a,b)=>tagN[b].all-tagN[a].all||a.localeCompare(b));
+  const secs=pdSections(items,o),groupName={type:'type',tag:'tag',date:'date'}[o.group];
+  const first=items.length?Math.min(...items.map(i=>i.created)):0,last=items.length?Math.max(...items.map(i=>i.created)):0;
+  let h=`<header class="pd-cover"><p class="pd-brand">Offload<i></i></p><p class="pd-eyebrow">Export · ${esc(fD(now))}</p>
+    <h1>Notes, lists &amp; reminders</h1>
+    <p class="pd-sub"><b>${o.scope==='view'&&filtered()?'Current view: '+esc(viewDesc()):'All entries'}</b>, organized by ${groupName}.${items.length?` Covers ${esc(fD(first))}${startOf(first)!==startOf(last)?' to '+esc(fD(last)):''}.`:''}<br>Exported ${esc(fDL(now))} at ${esc(fT(now))}.</p>
+    <dl class="pd-stats"><div><dt>Entries</dt><dd>${items.length}</dd></div><div><dt>Notes</dt><dd>${c.note}</dd></div><div><dt>Lists</dt><dd>${c.list}</dd></div><div><dt>Reminders</dt><dd>${c.reminder}</dd></div><div><dt>Tags</dt><dd>${tags.length}</dd></div></dl></header>`;
+  if(!items.length){$('#pdoc').innerHTML=h+'<p class="pd-empty">Nothing to export with these settings.</p>';return}
+  const showMap=o.map;
+  const toc=[];if(showMap)toc.push(['pd-map','Mind map','overview']);
+  secs.forEach(s=>toc.push([s.id,s.title,plural(s.items.length,'entry')]));
+  if(tags.length)toc.push(['pd-tags','Tag index',plural(tags.length,'tag')]);
+  if(toc.length>1&&toc.length<=40)h+=`<nav class="pd-toc"><p class="pd-label">Contents</p><ol>${toc.map(([id,t,n])=>`<li><a href="#${id}">${esc(t)}</a><span class="ld"></span><span class="n">${n}</span></li>`).join('')}</ol></nav>`;
+  if(showMap){const by=tags.length?'tag':'type',big=items.length>48,r=mmBuild(items,by,{print:true,entries:!big}),b=r.bounds,p=16;
+    h+=`<section class="pd-sec pd-map" id="pd-map"><h2 class="pd-h"><span>Mind map</span><small>${by==='tag'?'by tag':'by type'}</small></h2>
+      <p class="pd-note">${big?'Every tag and how many entries it holds.':'Every entry, branched by '+(by==='tag'?'tag. Entries with several tags appear on each branch.':'type.')}</p>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="${(b.x-p).toFixed(0)} ${(b.y-p).toFixed(0)} ${(b.w+2*p).toFixed(0)} ${(b.h+2*p).toFixed(0)}" role="img" aria-label="Mind map">${r.html}</svg></section>`}
+  secs.forEach(s=>{
+    h+=`<section class="pd-sec" id="${s.id}"><h2 class="pd-h"${s.color?` style="--sc:var(--${s.color})"`:''}>${s.color?'<i></i>':''}<span>${esc(s.title)}</span><small>${plural(s.items.length,'entry')}</small></h2>`;
+    h+=s.subs?s.subs.map(([t,l,cl])=>`<h3 class="pd-h3 ${cl}">${t} · ${l.length}</h3>${l.map(pdEntry).join('')}`).join(''):s.items.map(pdEntry).join('');
+    h+='</section>'});
+  if(tags.length)h+=`<section class="pd-sec" id="pd-tags"><h2 class="pd-h"><span>Tag index</span><small>${plural(tags.length,'tag')}</small></h2>
+    <table class="pd-tbl"><thead><tr><th>Tag</th><th class="n">Notes</th><th class="n">Lists</th><th class="n">Reminders</th><th class="n">Total</th></tr></thead><tbody>
+    ${tags.map(t=>{const x=tagN[t],cc=tcOf(t);return`<tr><td><span class="pt">${cc?`<i style="background:var(--${cc})"></i>`:''}#${esc(t)}</span></td><td class="n">${x.note||'–'}</td><td class="n">${x.list||'–'}</td><td class="n">${x.reminder||'–'}</td><td class="n"><b>${x.all}</b></td></tr>`}).join('')}
+    </tbody></table></section>`;
+  h+=`<footer class="pd-end"><span>Offload · ${plural(items.length,'entry')}</span><span>${esc(fD(now))} · ${esc(fT(now))}</span></footer>`;
+  $('#pdoc').innerHTML=h}
+function openPdf(){buildPdf();closeSheets();$('#pdfView').hidden=false;$('.pscroll').scrollTop=0;ovPush()}
+function closePdf(fromPop){if($('#pdfView').hidden)return;$('#pdfView').hidden=true;$('#pdoc').innerHTML='';if(!fromPop)ovPop()}
+$('#pHint').textContent=IS_IOS?'Tap Save as PDF, then the Share button at the top of the print screen, and choose Save to Files.':'Tap Save as PDF, then choose “Save as PDF” as the printer (or Destination).';
+$('#pGo').addEventListener('click',openPdf);
+$('#pBack').addEventListener('click',()=>closePdf());
+let titleBefore=null;
+function restoreTitle(){if(titleBefore!==null){document.title=titleBefore;titleBefore=null}}
+function doPrint(){const d=new Date(),p=n=>String(n).padStart(2,'0');
+  if(titleBefore===null)titleBefore=document.title;
+  document.title=`Offload export ${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`; // browsers use the title as the PDF file name
+  try{window.print()}catch(e){toast("This browser can't save PDFs. Try Chrome or Safari.")}}
+addEventListener('afterprint',restoreTitle);
+$('#pPrint').addEventListener('click',doPrint);
+// Ctrl/⌘+P prints the export, not the app screen
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&!e.altKey&&(e.key==='p'||e.key==='P')){e.preventDefault();if(!$('#pdfView').hidden)doPrint();else{closeMap();openExport()}}});
 
 /* ---------- keep the app on the visible screen when the keyboard opens ---------- */
 const vv=window.visualViewport;
@@ -745,7 +1230,7 @@ $('.composer').addEventListener('pointerdown',e=>{if(e.target.closest('button'))
 
 /* ---------- no zoom, no page bounce ---------- */
 // Only these areas may scroll; dragging anywhere else does nothing.
-const SCROLLERS='.feed,.sheet,.rail,.sugg,.whenrow,textarea,.prev';
+const SCROLLERS='.feed,.sheet,.rail,.sugg,.whenrow,textarea,.prev,.pscroll';
 ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
 document.addEventListener('touchmove',e=>{
   if(e.touches.length>1||(typeof e.scale==='number'&&e.scale!==1)){e.preventDefault();return}

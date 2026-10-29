@@ -1,5 +1,5 @@
 // Offload service worker: caches the app shell so it opens offline.
-const CACHE = 'offload-db1d6daf85';
+const CACHE = 'offload-c2ef155f0c';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
