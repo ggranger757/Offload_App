@@ -18,6 +18,9 @@ BG = '#0A0A0A'
 
 def main():
     app = SRC.read_text(encoding='utf-8')
+    # Shown at the bottom of Settings, so you can tell which version a device is running.
+    import datetime
+    app = app.replace('__BUILD__', datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
 
 
     head = f'''<!doctype html>

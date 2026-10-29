@@ -222,13 +222,14 @@ textarea#ta:focus{outline:none;border-color:var(--muted)}
 .act.danger{color:var(--due);font-weight:600}
 .seg{display:flex;background:var(--sunk);border-radius:10px;padding:3px;gap:3px}
 .seg button{flex:1;border:0;background:none;border-radius:8px;padding:8px;font-size:13.5px;font-weight:500}
-.seg button[aria-pressed="true"]{background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.seg button[aria-pressed="true"]{background:var(--raise);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.18),inset 0 0 0 1px var(--line)}
 .btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 14px;font-weight:600;font-size:14px}
 .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .btn.danger{color:var(--due)}
 .btns{display:flex;gap:8px;flex-wrap:wrap}
 .sheet textarea{width:100%;box-sizing:border-box;min-height:90px;border:1px solid var(--line);background:var(--sunk);border-radius:10px;padding:8px;font-family:var(--f-mono);font-size:12px;margin-bottom:8px}
 .note{font-size:13px;color:var(--muted);margin:6px 0 0;max-width:60ch}
+.note.build{margin-top:22px;font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
 .toast{position:fixed;left:50%;bottom:calc(120px + var(--kb,0px) + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;z-index:30;box-shadow:var(--shadow);max-width:calc(100% - 40px);text-align:center}
 
 /* ================= Desktop =================
@@ -411,11 +412,19 @@ textarea#ta:focus{outline:none;border-color:var(--muted)}
   <label class="toggle" for="autoCal"><input type="checkbox" id="autoCal"><span>Add new reminders to my Calendar<small id="autoCalNote">After you save a reminder, your phone's "Add to Calendar" screen opens with it filled in. Tap Add, and your phone alerts you even when Offload is closed.</small></span></label>
   <div class="btns" style="margin-top:12px"><button class="btn" id="bNotif">Turn on notifications</button></div>
   <p class="note" id="notifNote">Reminders always show inside the app. Notifications also alert you while the app is open in the background.</p>
-  <h4>Backup</h4>
-  <textarea id="io" placeholder="Paste a backup here to import it" aria-label="Backup data"></textarea>
-  <div class="btns"><button class="btn" id="bExport">Copy backup</button><button class="btn" id="bImport">Import</button></div>
+  <h4>Export</h4>
+  <p class="note" style="margin:0 0 10px">Save a copy of all your entries, tags and tag colors. Keep it somewhere safe, or open it on another device with Import.</p>
+  <div class="btns"><button class="btn primary" id="bDownload">Export backup file</button><button class="btn" id="bExport">Copy to clipboard</button></div>
+  <p class="note" id="lastExport" hidden></p>
+  <h4>Import</h4>
+  <p class="note" style="margin:0 0 10px">Adds the entries from a backup. Entries you already have are kept, never overwritten.</p>
+  <div class="btns" style="margin-bottom:10px"><button class="btn" id="bImportFile">Import backup file</button></div>
+  <input type="file" id="importFile" accept=".json,application/json,text/plain" hidden>
+  <textarea id="io" placeholder="…or paste a backup here" aria-label="Paste a backup to import"></textarea>
+  <div class="btns"><button class="btn" id="bImport">Import pasted backup</button></div>
   <h4>Data</h4>
   <div class="btns"><button class="btn" id="bClearEx">Remove examples</button><button class="btn danger" id="bWipe">Delete everything</button></div>
+  <p class="note build">Offload · build __BUILD__</p>
 </div>
 
 
@@ -806,7 +815,7 @@ function openItem(id){const it=find(id);if(!it)return;ui.itemId=id;
 /* ---------- reminders ---------- */
 function complete(it){
   if(it.done){it.done=false}
-  else if(it.repeat&&it.repeat.length){it.due=nextOcc(it.due+60e3,it.repeat,Math.max(Date.now(),it.due));it.notified=0;toast('Next one: '+dueLabel(it.due));}
+  else if(it.repeat&&it.repeat.length){it.due=nextOcc(it.due,it.repeat,Math.max(Date.now(),it.due));it.notified=0;toast('Next one: '+dueLabel(it.due));}
   else it.done=true;
   save();render(false);
 }
@@ -904,7 +913,7 @@ $('#itemSheet').addEventListener('click',async e=>{const b=e.target.closest('.ac
     S.items=S.items.filter(x=>x.id!==it.id);save();closeSheets();render(false);toast('Deleted')}
 });
 
-$('#bSettings').addEventListener('click',()=>{applySettings();updNotif();$('#autoCal').checked=!!S.settings.autoCal;openSheet('#setSheet')});
+$('#bSettings').addEventListener('click',()=>{applySettings();updNotif();showLastExport();$('#autoCal').checked=!!S.settings.autoCal;openSheet('#setSheet')});
 $('#autoCal').addEventListener('change',e=>{S.settings.autoCal=e.target.checked;save();toast(e.target.checked?'New reminders will open in Calendar':'Calendar step turned off')});
 if(!IS_IOS)$('#autoCalNote').textContent='After you save a reminder, Offload saves a calendar file. Open it to add the reminder to your calendar with an alert.';
 $('#segTheme').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.settings.theme=b.dataset.v;save();applySettings()});
@@ -914,13 +923,51 @@ function updNotif(){const b=$('#bNotif'),n=$('#notifNote');
   if(Notification.permission==='granted'){b.disabled=true;b.textContent='Notifications on'}
   else if(Notification.permission==='denied'){b.disabled=true;b.textContent='Notifications blocked';n.textContent='Notifications are blocked for this site. You can allow them in your browser settings. Reminders still show inside the app.'}}
 $('#bNotif').addEventListener('click',async()=>{try{const p=await Notification.requestPermission();if(p!=='granted')toast('Notifications were not allowed. Reminders will still show in the app.')}catch(e){toast('This browser view does not allow notifications.')}updNotif()});
-$('#bExport').addEventListener('click',async()=>{const data=JSON.stringify({app:'offload',v:4,tags:S.tags||[],tagColors:S.tagColors||{},items:S.items});$('#io').value=data;
-  try{await navigator.clipboard.writeText(data);toast('Backup copied')}catch(e){$('#io').select();toast('Backup is in the box. Select it and copy.')}});
-$('#bImport').addEventListener('click',()=>{try{const v=JSON.parse($('#io').value);const items=Array.isArray(v)?v:v.items;if(!Array.isArray(items))throw 0;
+/* ---------- backup: export (file or clipboard) and import (file or pasted text) ---------- */
+const backupJSON=()=>JSON.stringify({app:'offload',v:4,exported:new Date().toISOString(),tags:S.tags||[],tagColors:S.tagColors||{},items:S.items});
+const nEntries=n=>`${n} entr${n===1?'y':'ies'}`;
+function backupName(){const d=new Date(),p=x=>String(x).padStart(2,'0');return`offload-backup-${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}.json`}
+function noteExported(){S.settings.lastExport=Date.now();save();showLastExport()}
+function showLastExport(){const el=$('#lastExport'),t=S.settings.lastExport;el.hidden=!t;
+  if(t)el.textContent='Last exported '+new Date(t).toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'})+' at '+fT(t)+'.'}
+$('#bDownload').addEventListener('click',async()=>{
+  const data=backupJSON(),name=backupName(),n=S.items.length;
+  try{
+    // Installed iPhone app: a download link would leave the app. The share sheet offers "Save to Files".
+    if(IS_IOS&&STANDALONE&&navigator.share&&window.File){
+      const f=new File([data],name,{type:'application/json'});
+      if(!navigator.canShare||navigator.canShare({files:[f]})){
+        try{await navigator.share({files:[f],title:'Offload backup'});noteExported();toast(`Exported ${nEntries(n)}`)}
+        catch(err){if(err&&err.name!=='AbortError')toast("Couldn't open the share sheet. Try Copy to clipboard instead.")}
+        return}
+    }
+    const url=URL.createObjectURL(new Blob([data],{type:'application/json'}));
+    const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),60e3);
+    noteExported();toast(`Exported ${nEntries(n)} to ${name}`);
+  }catch(e){toast("This browser couldn't save the file. Try Copy to clipboard instead.")}
+});
+$('#bExport').addEventListener('click',async()=>{const data=backupJSON();
+  try{await navigator.clipboard.writeText(data);noteExported();toast(`Copied a backup of ${nEntries(S.items.length)}`)}
+  catch(e){$('#io').value=data;$('#io').select();toast('Copy is blocked here. The backup is in the box below: select it and copy.')}});
+function importText(text){
+  let v;try{v=JSON.parse(text)}catch(e){toast('That is not a valid backup. Use a file exported from Offload, or paste the whole backup.');return false}
+  const items=Array.isArray(v)?v:v&&v.items;
+  if(!Array.isArray(items)){toast('That is not a valid backup. Use a file exported from Offload, or paste the whole backup.');return false}
   if(v.tagColors&&typeof v.tagColors==='object'){S.tagColors=S.tagColors||{};Object.keys(v.tagColors).forEach(k=>{if(TCOLORS.includes(v.tagColors[k])&&!S.tagColors[k])S.tagColors[k]=v.tagColors[k]})}
-  migrateCats(items,v.cats);S.tags=[...new Set((S.tags||[]).concat((v.tags||[]).filter(x=>typeof x==='string')))];
-  const ids=new Set(S.items.map(i=>i.id));let n=0;items.forEach(i=>{if(i&&i.id&&i.type&&!ids.has(i.id)){S.items.push(i);n++}});
-  save();render();$('#io').value='';closeSheets();toast(`Imported ${n} entr${n===1?'y':'ies'}`)}catch(e){toast('That text is not a valid backup. Paste the whole backup and try again.')}});
+  const objs=items.filter(i=>i&&typeof i==='object');migrateCats(objs,v.cats);
+  S.tags=[...new Set((S.tags||[]).concat((Array.isArray(v.tags)?v.tags:[]).filter(x=>typeof x==='string')))];
+  const ids=new Set(S.items.map(i=>i.id));let n=0,dup=0;
+  objs.forEach(i=>{if(!i.id||!i.type)return;if(ids.has(i.id)){dup++;return}ids.add(i.id);S.items.push(i);n++});
+  if(!save())return false;
+  render();closeSheets();
+  toast(n?`Imported ${nEntries(n)}`+(dup?` (${dup} you already had were skipped)`:''):dup?'Nothing new: you already have every entry in that backup.':'That backup has no entries.');
+  return true}
+$('#bImport').addEventListener('click',()=>{const t=$('#io').value.trim();if(!t){toast('Paste a backup into the box first.');$('#io').focus();return}if(importText(t))$('#io').value=''});
+$('#bImportFile').addEventListener('click',()=>$('#importFile').click());
+$('#importFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;
+  if(f.size>20e6){toast('That file is too large to be an Offload backup.');return}
+  const r=new FileReader();r.onload=()=>importText(String(r.result||''));r.onerror=()=>toast("Couldn't read that file.");r.readAsText(f)});
 $('#bClearEx').addEventListener('click',()=>{S.items=S.items.filter(i=>!i.ex);save();render();toast('Examples removed')});
 $('#bWipe').addEventListener('click',e=>{const b=e.currentTarget;if(b.dataset.arm!=='1'){b.dataset.arm='1';b.textContent='Tap again: delete all';setTimeout(()=>{b.dataset.arm='';b.textContent='Delete everything'},4000);return}
   S.items=[];save();closeSheets();render();toast('Everything deleted');b.dataset.arm='';b.textContent='Delete everything'});

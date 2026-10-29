@@ -15,7 +15,7 @@ Offload is a progressive web app (PWA). It installs to the home screen, works of
 - **Share target.** On Android, share a link or text into Offload to start a note.
 - **New note shortcut.** On Android, press and hold the Offload icon and choose **New note** to open straight to the composer.
 - **Your choice of look.** A near-black dark theme by default for new installs, plus light and system; sans, serif or mono font.
-- **Backup.** Copy a JSON backup and import it on another device.
+- **Export and import.** In **Settings → Export**, save all your entries, tags and tag colors as a `.json` backup file (on an installed iPhone app, the share sheet offers **Save to Files**), or copy the backup to the clipboard. **Settings → Import** adds entries from a backup file or pasted text; entries you already have are never overwritten.
 
 **Live app:** https://ggranger757.github.io/OffloadApp/
 
@@ -58,7 +58,7 @@ To try it locally first, run `python3 -m http.server 8080` in the repository fol
 
 ## Limits
 
-- Entries live on one device. Use **Settings → Backup** to move them.
+- Entries live on one device. Use **Settings → Export** and **Import** to move them.
 - Offload's own reminder alerts only appear while the app is open or running in the background. Use **Add to Calendar** for alerts that arrive when it's closed.
 - Apple doesn't let web apps add to the Reminders or Calendar app without the user confirming, so adding to Calendar always takes one tap. Editing a reminder in Offload doesn't change a copy already in Calendar.
 
