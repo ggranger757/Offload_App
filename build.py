@@ -14,13 +14,10 @@ SRC = ROOT / 'src' / 'app.html'
 OUT = ROOT
 
 DESCRIPTION = "A private feed for everything you don't want to forget."
-BG = '#0A0A0A'
+BG = '#ECEFF3'
 
 def main():
     app = SRC.read_text(encoding='utf-8')
-    # Shown at the bottom of Settings, so you can tell which version a device is running.
-    import datetime
-    app = app.replace('__BUILD__', datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
 
 
     head = f'''<!doctype html>
