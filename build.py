@@ -1,4 +1,4 @@
-"""Build the Offload PWA into the repository root, where GitHub Pages serves it.
+"""Build the Brain Load PWA into the repository root, where GitHub Pages serves it.
 
 Edit src/app.html and src/sw.js, then run this to regenerate index.html, sw.js and manifest.webmanifest.
 
@@ -30,7 +30,7 @@ def main():
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Offload">
+<meta name="apple-mobile-web-app-title" content="Brain Load">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -40,7 +40,7 @@ def main():
     (OUT / 'index.html').write_text(page, encoding='utf-8')
 
     manifest = {
-        "name": "Offload", "short_name": "Offload", "description": DESCRIPTION,
+        "name": "Brain Load", "short_name": "Brain Load", "description": DESCRIPTION,
         "start_url": "./", "scope": "./", "display": "standalone",
         "background_color": BG, "theme_color": BG,
         "icons": [

@@ -1,4 +1,4 @@
-<title>Offload</title>
+<title>Brain Load</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -348,7 +348,7 @@ textarea#ta:focus{outline:none;border-color:var(--accent)}
   .pe-chk.cols{columns:1}
 }
 @page{margin:16mm 15mm 18mm;
-  @bottom-left{content:"Offload export";font-family:"JetBrains Mono",monospace;font-size:7.5pt;color:#5D6574}
+  @bottom-left{content:"Brain Load export";font-family:"JetBrains Mono",monospace;font-size:7.5pt;color:#5D6574}
   @bottom-right{content:"Page " counter(page) " of " counter(pages);font-family:"JetBrains Mono",monospace;font-size:7.5pt;color:#5D6574}}
 @media print{
   html,body{height:auto!important;overflow:visible!important;background:#fff!important}
@@ -360,13 +360,15 @@ textarea#ta:focus{outline:none;border-color:var(--accent)}
   .pdoc{max-width:none;padding:0;margin:0;box-shadow:none;border-radius:0;font-size:9.8pt}
   .pd-map{break-before:page;page-break-before:always}
 }
+/* the longer name needs a little room on the smallest phones */
+@media (max-width:359px){.logo{font-size:21px}.top .ib{width:40px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
 <div id="app">
   <header>
     <div class="top gut">
-      <h1 class="logo">Offload<i aria-hidden="true"></i></h1>
+      <h1 class="logo">Brain Load<i aria-hidden="true"></i></h1>
       <span class="sp"></span>
       <button class="ib" id="bSearch" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
       <button class="ib" id="bMap" aria-label="Mind map" title="Mind map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="8.5" y="9.5" width="7" height="5" rx="2.5"/><circle cx="4" cy="5" r="2"/><circle cx="4" cy="19" r="2"/><circle cx="20" cy="5" r="2"/><circle cx="20" cy="19" r="2"/><path d="M8.5 11c-2 0-2.5-4.5-3-4.6M8.5 13c-2 0-2.5 4.5-3 4.6M15.5 11c2 0 2.5-4.5 3-4.6M15.5 13c2 0 2.5 4.5 3 4.6"/></svg></button>
@@ -429,18 +431,18 @@ textarea#ta:focus{outline:none;border-color:var(--accent)}
   <h4>Font</h4>
   <div class="seg" id="segFont"><button data-v="sans">Sans</button><button data-v="serif">Serif</button><button data-v="mono">Mono</button></div>
   <h4>Reminders</h4>
-  <label class="toggle" for="autoCal"><input type="checkbox" id="autoCal"><span>Add new reminders to my Calendar<small id="autoCalNote">After you save a reminder, your phone's "Add to Calendar" screen opens with it filled in. Tap Add, and your phone alerts you even when Offload is closed.</small></span></label>
+  <label class="toggle" for="autoCal"><input type="checkbox" id="autoCal"><span>Add new reminders to my Calendar<small id="autoCalNote">After you save a reminder, your phone's "Add to Calendar" screen opens with it filled in. Tap Add, and your phone alerts you even when Brain Load is closed.</small></span></label>
   <div class="btns" style="margin-top:12px"><button class="btn" id="bNotif">Turn on notifications</button></div>
   <p class="note" id="notifNote">Reminders always show inside the app. Notifications also alert you while the app is open in the background.</p>
   <h4>Quick add by voice</h4>
-  <p class="note">Offload can save a note from a link, so a voice assistant or shortcut can add to it for free. Everything after <code>?add=</code> becomes a new note. Add <code>&amp;tag=work</code> to file it under a tag.</p>
+  <p class="note">Brain Load can save a note from a link, so a voice assistant or shortcut can add to it for free. Everything after <code>?add=</code> becomes a new note. Add <code>&amp;tag=work</code> to file it under a tag.</p>
   <div class="btns" style="margin-top:8px"><button class="btn" id="bQuickLink">Copy quick-add link</button></div>
   <p class="note"><b>iPhone, with Siri:</b></p>
-  <ol class="how"><li>Open the Shortcuts app and make a new shortcut named “Offload”.</li><li>Add <b>Dictate Text</b>, then <b>URL Encode</b> (on the dictated text).</li><li>Add <b>Open URLs</b> and paste the quick-add link, then the encoded text after it.</li><li>Say “Hey Siri, Offload”.</li></ol>
-  <p class="note">iPhone caveat: that link opens in Safari, which keeps its own copy of your entries, separate from the home-screen app. It works if you use Offload in Safari.</p>
-  <p class="note"><b>Android:</b> share any text to Offload from another app, or press and hold the Offload icon and choose New note, then tap the microphone on your keyboard. Automation apps such as MacroDroid can open the quick-add link with text you dictate.</p>
+  <ol class="how"><li>Open the Shortcuts app and make a new shortcut named “Brain Load”.</li><li>Add <b>Dictate Text</b>, then <b>URL Encode</b> (on the dictated text).</li><li>Add <b>Open URLs</b> and paste the quick-add link, then the encoded text after it.</li><li>Say “Hey Siri, Brain Load”.</li></ol>
+  <p class="note">iPhone caveat: that link opens in Safari, which keeps its own copy of your entries, separate from the home-screen app. It works if you use Brain Load in Safari.</p>
+  <p class="note"><b>Android:</b> share any text to Brain Load from another app, or press and hold the Brain Load icon and choose New note, then tap the microphone on your keyboard. Automation apps such as MacroDroid can open the quick-add link with text you dictate.</p>
   <h4>Install</h4>
-  <div class="btns"><button class="btn primary" id="bInstall" hidden>Install Offload</button></div>
+  <div class="btns"><button class="btn primary" id="bInstall" hidden>Install Brain Load</button></div>
   <p class="note">On iPhone: tap Share, then Add to Home Screen. On Android or desktop Chrome: use Install app in the browser menu.</p>
   <h4>Export</h4>
   <div class="btns"><button class="btn" id="bPdf2">Export as PDF</button><button class="btn" id="bMap2">Open mind map</button></div>
@@ -520,7 +522,7 @@ textarea#ta:focus{outline:none;border-color:var(--accent)}
 (function(){
 "use strict";
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const KEY='offload:v1', HR=36e5, DAY=864e5;
+const KEY='offload:v1' /* storage key kept from the old name so existing entries load */, HR=36e5, DAY=864e5;
 const DOW=['S','M','T','W','T','F','S'], DOWN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const root=document.documentElement, hostTheme=root.getAttribute('data-theme');
 
@@ -750,8 +752,8 @@ function icsUTC(t){return new Date(t).toISOString().replace(/[-:]/g,'').replace(
 function buildICS(it){
   const title=(it.text||'Reminder').replace(/(^|\s)#[\p{L}\p{N}_-]+/gu,'').replace(/\s+/g,' ').trim()||'Reminder';
   const tags=tagsOf(it.text);
-  const notes=['Reminder from Offload',tags.length?'Tags: '+tags.map(t=>'#'+t).join(' '):''].filter(Boolean).join('\n');
-  const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Offload//Reminders//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH',
+  const notes=['Reminder from Brain Load',tags.length?'Tags: '+tags.map(t=>'#'+t).join(' '):''].filter(Boolean).join('\n');
+  const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Brain Load//Reminders//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH',
     'BEGIN:VEVENT','UID:'+it.id+'@offload','DTSTAMP:'+icsUTC(Date.now()),
     // local "floating" time, so the event stays at the same clock time wherever the phone is
     'DTSTART:'+icsLocal(it.due),'DTEND:'+icsLocal(it.due+15*60e3),
@@ -875,7 +877,7 @@ $('#itemSheet').addEventListener('click',async e=>{const b=e.target.closest('.ac
 
 $('#bSettings').addEventListener('click',()=>{applySettings();updNotif();$('#autoCal').checked=!!S.settings.autoCal;openSheet('#setSheet')});
 $('#autoCal').addEventListener('change',e=>{S.settings.autoCal=e.target.checked;save();toast(e.target.checked?'New reminders will open in Calendar':'Calendar step turned off')});
-if(!IS_IOS)$('#autoCalNote').textContent='After you save a reminder, Offload saves a calendar file. Open it to add the reminder to your calendar with an alert.';
+if(!IS_IOS)$('#autoCalNote').textContent='After you save a reminder, Brain Load saves a calendar file. Open it to add the reminder to your calendar with an alert.';
 $('#segTheme').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.settings.theme=b.dataset.v;save();applySettings()});
 $('#segFont').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.settings.font=b.dataset.v;save();applySettings()});
 function updNotif(){const b=$('#bNotif'),n=$('#notifNote');
@@ -955,7 +957,7 @@ function entrySub(it){
   return'Note · '+fD(it.created)}
 function mmTree(items,by,o){
   items=items.slice().sort((a,b)=>(!!b.pinned-!!a.pinned)||a.created-b.created);
-  const rootN={key:'root',kind:'root',label:'Offload',sub:plural(items.length,'entry'),children:[]};
+  const rootN={key:'root',kind:'root',label:'Brain Load',sub:plural(items.length,'entry'),children:[]};
   const entry=(it,pk,color)=>{const key=pk+'/'+it.id;
     const n={key,kind:'entry',it,color,label:entryLabel(it),sub:entrySub(it),children:[]};
     if(it.type==='list'&&!o.print)n.children=it.items.map((x,i)=>({key:key+'/'+i,kind:'leaf',it,i,color,done:x.done,label:clip(noTags(x.t)||x.t,40),children:[]}));
@@ -1160,7 +1162,7 @@ function buildPdf(){
   const tags=Object.keys(tagN).sort((a,b)=>tagN[b].all-tagN[a].all||a.localeCompare(b));
   const secs=pdSections(items,o),groupName={type:'type',tag:'tag',date:'date'}[o.group];
   const first=items.length?Math.min(...items.map(i=>i.created)):0,last=items.length?Math.max(...items.map(i=>i.created)):0;
-  let h=`<header class="pd-cover"><p class="pd-brand">Offload<i></i></p><p class="pd-eyebrow">Export · ${esc(fD(now))}</p>
+  let h=`<header class="pd-cover"><p class="pd-brand">Brain Load<i></i></p><p class="pd-eyebrow">Export · ${esc(fD(now))}</p>
     <h1>Notes, lists &amp; reminders</h1>
     <p class="pd-sub"><b>${o.scope==='view'&&filtered()?'Current view: '+esc(viewDesc()):'All entries'}</b>, organized by ${groupName}.${items.length?` Covers ${esc(fD(first))}${startOf(first)!==startOf(last)?' to '+esc(fD(last)):''}.`:''}<br>Exported ${esc(fDL(now))} at ${esc(fT(now))}.</p>
     <dl class="pd-stats"><div><dt>Entries</dt><dd>${items.length}</dd></div><div><dt>Notes</dt><dd>${c.note}</dd></div><div><dt>Lists</dt><dd>${c.list}</dd></div><div><dt>Reminders</dt><dd>${c.reminder}</dd></div><div><dt>Tags</dt><dd>${tags.length}</dd></div></dl></header>`;
@@ -1182,7 +1184,7 @@ function buildPdf(){
     <table class="pd-tbl"><thead><tr><th>Tag</th><th class="n">Notes</th><th class="n">Lists</th><th class="n">Reminders</th><th class="n">Total</th></tr></thead><tbody>
     ${tags.map(t=>{const x=tagN[t],cc=tcOf(t);return`<tr><td><span class="pt">${cc?`<i style="background:var(--${cc})"></i>`:''}#${esc(t)}</span></td><td class="n">${x.note||'–'}</td><td class="n">${x.list||'–'}</td><td class="n">${x.reminder||'–'}</td><td class="n"><b>${x.all}</b></td></tr>`}).join('')}
     </tbody></table></section>`;
-  h+=`<footer class="pd-end"><span>Offload · ${plural(items.length,'entry')}</span><span>${esc(fD(now))} · ${esc(fT(now))}</span></footer>`;
+  h+=`<footer class="pd-end"><span>Brain Load · ${plural(items.length,'entry')}</span><span>${esc(fD(now))} · ${esc(fT(now))}</span></footer>`;
   $('#pdoc').innerHTML=h}
 function openPdf(){buildPdf();closeSheets();$('#pdfView').hidden=false;$('.pscroll').scrollTop=0;ovPush()}
 function closePdf(fromPop){if($('#pdfView').hidden)return;$('#pdfView').hidden=true;$('#pdoc').innerHTML='';if(!fromPop)ovPop()}
@@ -1193,7 +1195,7 @@ let titleBefore=null;
 function restoreTitle(){if(titleBefore!==null){document.title=titleBefore;titleBefore=null}}
 function doPrint(){const d=new Date(),p=n=>String(n).padStart(2,'0');
   if(titleBefore===null)titleBefore=document.title;
-  document.title=`Offload export ${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`; // browsers use the title as the PDF file name
+  document.title=`Brain Load export ${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`; // browsers use the title as the PDF file name
   try{window.print()}catch(e){toast("This browser can't save PDFs. Try Chrome or Safari.")}}
 addEventListener('afterprint',restoreTitle);
 $('#pPrint').addEventListener('click',doPrint);
@@ -1264,7 +1266,7 @@ let quickMsg='';
 if(share.has('add')||share.has('new')){
   const raw=(share.get('add')||'').trim();
   if(raw){let tag=tagSlug(share.get('tag')||'');if(tag&&!tagsOf(raw).includes(tag))tag='#'+tag;else tag='';
-    S.items.push({id:uid(),type:'note',text:(raw+' '+tag).trim(),created:Date.now()});save();quickMsg='Saved to Offload'}
+    S.items.push({id:uid(),type:'note',text:(raw+' '+tag).trim(),created:Date.now()});save();quickMsg='Saved to Brain Load'}
   try{history.replaceState(null,'',location.pathname)}catch(e){}
 }
 $('#bQuickLink').addEventListener('click',async()=>{const u=location.origin+location.pathname+'?add=';

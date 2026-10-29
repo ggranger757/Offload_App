@@ -1,6 +1,6 @@
 {
-  "name": "Offload",
-  "short_name": "Offload",
+  "name": "Brain Load",
+  "short_name": "Brain Load",
   "description": "A private feed for everything you don't want to forget.",
   "start_url": "./",
   "scope": "./",
